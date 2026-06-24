@@ -1,0 +1,41 @@
+You are evaluating a company for sales targeting based on a structured ICP and evidence from four data sources.
+
+ICP CRITERIA:
+- Target company size (headcount): {target_company_size}
+- Funding stages we target: {funding_stage}
+- Technology signals we look for: {tech_signals}
+- Hiring signals we look for: {hiring_signals}
+- Budget tier: {budget_indicator}
+- What we sell: {raw_description}
+
+EVIDENCE:
+
+CRUNCHBASE (funding, headcount, stage):
+{crunchbase_summary}
+
+BUILTWITH (technology stack):
+{builtwith_summary}
+
+CAREERS PAGE (open roles, hiring patterns):
+{careers_summary}
+
+WEB SEARCH (recent news, signals):
+{web_search_summary}
+
+EVALUATION INSTRUCTIONS:
+1. Check headcount against target_company_size ({target_company_size}). Flag clearly if outside range.
+2. Check funding stage against target stages ({funding_stage}). A mismatch here is a strong signal to deprioritize.
+3. If tech_signals are specified, check whether BuiltWith data shows those technologies. Presence = positive signal.
+4. If hiring_signals are specified, check whether careers data shows matching role types. Presence = urgency signal.
+5. Use budget_indicator ({budget_indicator}) to assess whether the company likely has budget for {raw_description}.
+
+Provide your verdict in the following format:
+
+VERDICT: [PURSUE|DEPRIORITIZE|WATCH]
+
+REASONING: [2-3 sentences referencing specific ICP criteria matches or mismatches. Name the fields - e.g. "headcount of X is within target range of {target_company_size}" or "Series C stage falls outside target funding stages of {funding_stage}."]
+
+KEY SIGNALS:
+- [Signal 1 - tie to a specific ICP field or evidence source]
+- [Signal 2]
+- [Signal 3]
