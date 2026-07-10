@@ -1,77 +1,109 @@
-import requests
-from bs4 import BeautifulSoup
+import os
+import json
+import time
+from anthropic import Anthropic
 from typing import Dict, Any
 import logging
+from backend.telemetry import log_anthropic_usage
 
 logger = logging.getLogger(__name__)
 
+
+def _extract_hiring_fields(company_name: str, text: str, client: Anthropic) -> dict:
+    """Use Haiku to extract structured hiring data from web search text."""
+    prompt = f"""Extract hiring information for {company_name} from this text.
+Return ONLY valid JSON with exactly these fields, no other text:
+{{
+    "open_positions": ["list of specific job titles found, max 10"],
+    "hiring_departments": ["list of departments e.g. Engineering, Sales, Marketing"],
+    "hiring_active": true or false,
+    "headcount_signal": "growing|stable|shrinking|unknown"
+}}
+Only include what is explicitly stated. Use empty arrays if no positions found.
+
+Text:
+{text}"""
+
+    model = "claude-haiku-4-5-20251001"
+    started_at = time.perf_counter()
+    response = client.messages.create(
+        model=model,
+        max_tokens=256,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    log_anthropic_usage(
+        logger,
+        operation="careers.extract_hiring_fields",
+        model=model,
+        started_at=started_at,
+        response=response,
+    )
+
+    try:
+        raw = response.content[0].text.strip()
+        raw = raw.replace("```json", "").replace("```", "").strip()
+        return json.loads(raw)
+    except Exception:
+        return {
+            "open_positions": [],
+            "hiring_departments": [],
+            "hiring_active": False,
+            "headcount_signal": "unknown"
+        }
+
+
 def get_careers_page_data(company_name: str, careers_url: str = None) -> Dict[str, Any]:
     """
-    Scrapes company careers page for open roles and hiring signals.
-
-    Args:
-        company_name: The company name
-        careers_url: Direct URL to careers page (optional)
-
-    Returns:
-        Dict with raw_data and summary (summary populated by LLM)
+    Finds hiring signals for a company via web search.
+    The careers_url param is accepted for backwards compatibility but ignored —
+    direct scraping was replaced after guessed domains failed to resolve.
     """
-    if not careers_url:
-        # Construct common careers page URLs
-        domain = company_name.lower().replace(" ", "")
-        possible_urls = [
-            f"https://{domain}.com/careers",
-            f"https://jobs.{domain}.com",
-            f"https://www.{domain}.com/careers"
-        ]
-    else:
-        possible_urls = [careers_url]
+    client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
     careers_data = {
         "company_name": company_name,
-        "careers_url": careers_url,
         "open_positions": [],
         "hiring_departments": [],
+        "hiring_active": False,
+        "headcount_signal": "unknown",
         "error": None
     }
 
-    for url in possible_urls:
-        try:
-            headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-            }
-            response = requests.get(url, headers=headers, timeout=10)
+    try:
+        query = (
+            f'"{company_name}" jobs hiring "open positions" '
+            f'OR "job openings" OR careers site:greenhouse.io OR site:lever.co '
+            f'OR site:linkedin.com/jobs 2024 2025'
+        )
+        model = "claude-sonnet-4-6"
+        started_at = time.perf_counter()
+        response = client.messages.create(
+            model=model,
+            max_tokens=512,
+            tools=[{"type": "web_search_20250305", "name": "web_search"}],
+            messages=[{"role": "user", "content": query}]
+        )
+        log_anthropic_usage(
+            logger,
+            operation="careers.web_search",
+            model=model,
+            started_at=started_at,
+            response=response,
+        )
 
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.content, 'html.parser')
+        text = " ".join([
+            block.text for block in response.content
+            if hasattr(block, "text")
+        ])
 
-                # Look for job listings - common patterns
-                job_titles = []
-                for job_elem in soup.find_all(['h2', 'h3', 'span', 'a'],
-                                             {'class': ['job', 'position', 'title', 'opening']}):
-                    text = job_elem.get_text(strip=True)
-                    if text and len(text) < 100:
-                        job_titles.append(text)
+        extracted = _extract_hiring_fields(company_name, text, client)
+        careers_data.update(extracted)
 
-                # Extract departments from job postings
-                departments = set()
-                for elem in soup.find_all(['div', 'p'], {'class': 'department'}):
-                    dept = elem.get_text(strip=True)
-                    if dept:
-                        departments.add(dept)
-
-                careers_data["open_positions"] = job_titles[:10] if job_titles else []
-                careers_data["hiring_departments"] = list(departments) if departments else []
-                careers_data["careers_url"] = url
-
-                if job_titles or departments:
-                    break
-        except requests.RequestException as e:
-            careers_data["error"] = str(e)
-            logger.warning(f"Failed to fetch {url}: {e}")
-            continue
+    except Exception as e:
+        careers_data["error"] = str(e)
+        logger.warning(f"Careers web search failed for {company_name}: {e}")
 
     return {
         "raw_data": careers_data,
-        "summary": None  # Will be populated by LLM
+        "summary": None
     }

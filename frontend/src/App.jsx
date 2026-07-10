@@ -45,17 +45,17 @@ function App() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--color-background-primary)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--color-background-primary)', color: 'var(--color-text-primary)' }}>
       {error && (
-        <div style={{ padding: '1rem 2rem', background: 'rgba(248,81,73,0.1)', borderBottom: '0.5px solid rgba(248,81,73,0.4)', color: '#f85149', fontSize: 14 }}>
+        <div style={{ padding: '1rem 1.5rem', background: 'rgba(248,81,73,0.1)', borderBottom: '1px solid rgba(248,81,73,0.35)', color: '#f85149', fontSize: 14 }}>
           Error: {error}
         </div>
       )}
 
       {loading && (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', flexDirection: 'column', gap: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', flexDirection: 'column', gap: 16, padding: '0 1rem' }}>
           <div className="animate-spin" style={{ width: 32, height: 32, border: '2px solid var(--color-border-primary)', borderTopColor: 'var(--color-text-success)', borderRadius: '50%' }} />
-          <p style={{ color: 'var(--color-text-secondary)', fontSize: 14 }}>Analyzing company...</p>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: 14, textAlign: 'center', maxWidth: 360 }}>Running web searches, extracting signals, checking tech stack...</p>
         </div>
       )}
 
@@ -64,12 +64,12 @@ function App() {
       )}
 
       {!loading && phase === 'result' && companyData && (
-        <div style={{ maxWidth: 600, margin: '0 auto', padding: '2rem' }}>
+        <div style={{ maxWidth: 760, margin: '0 auto', padding: '2rem 1rem' }}>
           <VerdictCard verdict={companyData.verdict} company={companyData.company_name} />
           <EvidencePanel evidence={companyData.evidence} />
           <button
             onClick={handleStartOver}
-            style={{ width: '100%', marginTop: '1rem', padding: '11px', borderRadius: 'var(--border-radius-md)', border: '0.5px solid var(--color-border-secondary)', background: 'var(--color-background-secondary)', color: 'var(--color-text-secondary)', fontSize: 14, cursor: 'pointer' }}
+            style={{ width: '100%', marginTop: '1.5rem', padding: '13px', borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border-secondary)', background: 'var(--color-background-secondary)', color: 'var(--color-text-secondary)', fontSize: 14, cursor: 'pointer' }}
           >
             Analyze another company
           </button>

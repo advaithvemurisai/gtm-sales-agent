@@ -1,4 +1,6 @@
+import logging
 import os
+import time
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -6,6 +8,9 @@ from dotenv import load_dotenv
 from backend.agent.icp_conversation import run_icp_conversation, infer_icp_signals
 from backend.agent.pipeline import run_evaluation_pipeline
 from backend.agent.verdict import format_verdict_display
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+logger = logging.getLogger("gtm_agent.api")
 
 load_dotenv()
 
@@ -36,6 +41,7 @@ class AnalyzeResponse(BaseModel):
     company_name: str
     verdict: dict
     evidence: dict
+    summary: dict
 
 
 @app.post("/analyze")
@@ -45,17 +51,12 @@ async def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
     For MVP, we skip the interactive ICP conversation and go straight to evaluation
     with a default ICP profile.
     """
+    started_at = time.perf_counter()
+    logger.info("Analyze request received for company=%s", request.company_name)
     try:
-        # Phase 1 stub - infer signals from product_description until real conversation is wired
-        signals = infer_icp_signals(request.product_description)
-        icp_profile = {
-            "target_company_size": "50-500",
-            "funding_stage": ["Series A", "Series B"],
-            "tech_signals": signals["tech_signals"],
-            "hiring_signals": signals["hiring_signals"],
-            "budget_indicator": "mid-market",
-            "raw_description": request.product_description,
-        }
+        # Infer all ICP fields from product description - nothing hardcoded
+        icp_profile = infer_icp_signals(request.product_description)
+        icp_profile["raw_description"] = request.product_description
 
         # Run evaluation pipeline
         result = run_evaluation_pipeline(
@@ -67,19 +68,39 @@ async def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
         verdict = format_verdict_display(result["verdict"])
 
         evidence = {
-            "crunchbase": result["crunchbase"]["summary"],
+            "company_signals": result["web_search"]["raw_data"].get("company_signals", {}),
             "builtwith": result["builtwith"]["summary"],
             "careers": result["careers"]["summary"],
             "web_search": result["web_search"]["summary"],
         }
 
+        summary = {
+            "decision": verdict["decision"],
+            "signal_count": len(verdict.get("signals", [])),
+            "reasoning_preview": verdict.get("reasoning", "")[:220],
+            "evidence_sources": ["company_signals", "builtwith", "careers", "web_search"],
+        }
+
+        logger.info(
+            "Analyze response prepared for company=%s with decision=%s duration_ms=%.1f",
+            request.company_name,
+            verdict["decision"],
+            (time.perf_counter() - started_at) * 1000,
+        )
+
         return AnalyzeResponse(
             company_name=request.company_name,
             verdict=verdict,
-            evidence=evidence
+            evidence=evidence,
+            summary=summary,
         )
 
     except Exception as e:
+        logger.exception(
+            "Analyze pipeline failed for company=%s duration_ms=%.1f",
+            request.company_name,
+            (time.perf_counter() - started_at) * 1000,
+        )
         raise HTTPException(status_code=500, detail=str(e))
 
 

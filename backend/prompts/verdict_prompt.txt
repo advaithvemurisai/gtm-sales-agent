@@ -1,41 +1,52 @@
-You are evaluating a company for sales targeting based on a structured ICP and evidence from four data sources.
+You are evaluating a company for sales targeting based on a structured ICP and evidence from multiple data sources.
 
-ICP CRITERIA:
-- Target company size (headcount): {target_company_size}
+ICP CRITERIA (inferred from what the seller sells):
+- What we sell: {raw_description}
+- Target company size: {target_company_size}
 - Funding stages we target: {funding_stage}
 - Technology signals we look for: {tech_signals}
 - Hiring signals we look for: {hiring_signals}
 - Budget tier: {budget_indicator}
-- What we sell: {raw_description}
+
+Note: If any ICP field is null or empty, do not penalize the company for that dimension. Only evaluate against criteria that are specified.
+
+COMPANY SIGNALS (extracted from web search):
+- Funding stage: {company_signals_funding_stage}
+- Headcount: {company_signals_headcount_range}
+- Founded: {company_signals_founded_year}
+- Headquarters: {company_signals_headquarters}
+- Revenue estimate: {company_signals_revenue_estimate}
 
 EVIDENCE:
 
-CRUNCHBASE (funding, headcount, stage):
-{crunchbase_summary}
-
-BUILTWITH (technology stack):
+TECH STACK (BuiltWith):
 {builtwith_summary}
 
-CAREERS PAGE (open roles, hiring patterns):
+HIRING SIGNALS (Careers):
 {careers_summary}
 
-WEB SEARCH (recent news, signals):
-{web_search_summary}
+COMPANY FUNDAMENTALS (Web Search):
+{fundamentals_summary}
+
+RECENT NEWS (Web Search):
+{news_summary}
 
 EVALUATION INSTRUCTIONS:
-1. Check headcount against target_company_size ({target_company_size}). Flag clearly if outside range.
-2. Check funding stage against target stages ({funding_stage}). A mismatch here is a strong signal to deprioritize.
-3. If tech_signals are specified, check whether BuiltWith data shows those technologies. Presence = positive signal.
-4. If hiring_signals are specified, check whether careers data shows matching role types. Presence = urgency signal.
-5. Use budget_indicator ({budget_indicator}) to assess whether the company likely has budget for {raw_description}.
+1. If target_company_size is specified, check headcount_range against it. Flag clearly if outside range.
+2. If funding_stage is specified, check company funding stage against it. A mismatch is a strong deprioritize signal.
+3. If tech_signals are specified, check BuiltWith summary for those tools. Presence = positive signal.
+4. If hiring_signals are specified, check careers summary for matching roles. Presence = urgency signal.
+5. If budget_indicator is specified, use revenue and funding to assess whether the company likely has budget.
+6. Weight web search signals most heavily when sources conflict.
+7. If data is missing or conflicting, say so explicitly rather than guessing.
 
-Provide your verdict in the following format:
+Respond in exactly this format:
 
 VERDICT: [PURSUE|DEPRIORITIZE|WATCH]
 
-REASONING: [2-3 sentences referencing specific ICP criteria matches or mismatches. Name the fields - e.g. "headcount of X is within target range of {target_company_size}" or "Series C stage falls outside target funding stages of {funding_stage}."]
+REASONING: [2-3 sentences referencing specific evidence. Name sources. Name ICP fields. e.g. "Headcount of 93-200 overlaps target range of 50-500 (web search). Funding stage unknown but revenue of $66M suggests mid-market budget capacity."]
 
 KEY SIGNALS:
-- [Signal 1 - tie to a specific ICP field or evidence source]
+- [Signal 1 - name the source and ICP field it relates to]
 - [Signal 2]
 - [Signal 3]

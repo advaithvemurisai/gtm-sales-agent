@@ -1,50 +1,94 @@
 import React, { useState } from 'react';
+import FormattedText from './FormattedText';
 
-function EvidencePanel({ evidence }) {
-  const [expandedSection, setExpandedSection] = useState(null);
+const SIGNAL_LABELS = {
+  funding_stage: 'Funding stage',
+  total_funding: 'Total funding',
+  headcount: 'Headcount',
+  headcount_range: 'Headcount range',
+  founded_year: 'Founded',
+  headquarters: 'Headquarters',
+  revenue_estimate: 'Revenue estimate',
+};
 
-  const sections = [
-    { id: 'crunchbase', title: 'Crunchbase', icon: '💰' },
-    { id: 'builtwith', title: 'BuiltWith', icon: '⚙️' },
-    { id: 'careers', title: 'Careers Page', icon: '👥' },
-    { id: 'web_search', title: 'Web Search', icon: '🔍' },
-  ];
+function SignalGrid({ signals }) {
+  const rows = Object.entries(SIGNAL_LABELS)
+    .filter(([key]) => signals?.[key] && signals[key] !== 'Unknown')
+    .map(([key, label]) => ({ label, value: signals[key] }));
 
-  const toggleSection = (id) => {
-    setExpandedSection(expandedSection === id ? null : id);
-  };
+  if (!rows.length) {
+    return <p style={{ fontSize: 13, color: 'var(--color-text-tertiary)' }}>No structured signals extracted.</p>;
+  }
 
   return (
-    <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-white mb-4">Supporting Evidence</h3>
-
-      {sections.map((section) => (
-        <div
-          key={section.id}
-          className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden"
-        >
-          <button
-            onClick={() => toggleSection(section.id)}
-            className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-700/50 transition"
-          >
-            <div className="flex items-center space-x-3">
-              <span className="text-xl">{section.icon}</span>
-              <span className="font-semibold text-white">{section.title}</span>
-            </div>
-            <span className={`text-slate-400 transition ${expandedSection === section.id ? 'rotate-180' : ''}`}>
-              ▼
-            </span>
-          </button>
-
-          {expandedSection === section.id && (
-            <div className="border-t border-slate-700 px-6 py-4 bg-slate-900/50">
-              <p className="text-slate-300 text-sm leading-relaxed">
-                {evidence[section.id] || 'No data available'}
-              </p>
-            </div>
-          )}
+    <div style={{ display: 'grid', gap: 10 }}>
+      {rows.map(({ label, value }) => (
+        <div key={label} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '0.9rem 1rem', borderRadius: 8, background: 'rgba(255, 255, 255, 0.02)' }}>
+          <span style={{ fontSize: 12, color: 'var(--color-text-tertiary)' }}>{label}</span>
+          <span style={{ fontSize: 13, color: 'var(--color-text-primary)', fontWeight: 500, textAlign: 'right' }}>{value}</span>
         </div>
       ))}
+    </div>
+  );
+}
+
+const SECTIONS = [
+  { id: 'company_signals', title: 'Company Signals', icon: 'ti-chart-infographic', type: 'structured' },
+  { id: 'web_search', title: 'Web Search', icon: 'ti-world-search', type: 'text' },
+  { id: 'builtwith', title: 'Tech Stack', icon: 'ti-stack-2', type: 'text' },
+  { id: 'careers', title: 'Hiring Signals', icon: 'ti-users', type: 'text' },
+];
+
+function EvidencePanel({ evidence }) {
+  const [expanded, setExpanded] = useState('company_signals');
+  const toggle = (id) => setExpanded(expanded === id ? null : id);
+
+  return (
+    <div style={{ marginTop: '1.75rem', maxWidth: 760, margin: '1.75rem auto 0' }}>
+      <div style={{ marginBottom: '0.8rem' }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-text-secondary)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6 }}>
+          Supporting evidence
+        </p>
+        <p style={{ fontSize: 13, color: 'var(--color-text-tertiary)', lineHeight: 1.6, margin: 0 }}>
+          Expand any section to review the most relevant signals behind the verdict.
+        </p>
+      </div>
+
+      <div style={{ display: 'grid', gap: 12 }}>
+        {SECTIONS.map(({ id, title, icon, type }) => {
+          const isOpen = expanded === id;
+          const hasData = evidence && (type === 'structured' ? evidence[id] : evidence[id]);
+
+          return (
+            <div key={id} style={{ border: '1px solid var(--color-border-secondary)', borderRadius: 'var(--border-radius-md)', background: 'var(--color-background-secondary)', overflow: 'hidden' }}>
+              <button
+                onClick={() => toggle(id)}
+                style={{ width: '100%', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(255, 255, 255, 0.04)', display: 'grid', placeItems: 'center' }}>
+                    <i className={`ti ${icon}`} style={{ fontSize: 12, color: 'var(--color-text-secondary)' }} />
+                  </div>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-primary)' }}>{title}</span>
+                </div>
+                <span style={{ fontSize: 13, color: 'var(--color-text-tertiary)' }}>{isOpen ? 'Close' : 'Open'}</span>
+              </button>
+
+              {isOpen && (
+                <div style={{ padding: '1rem 1rem 1.1rem', background: 'rgba(255, 255, 255, 0.02)' }}>
+                  {!hasData ? (
+                    <p style={{ fontSize: 13, color: 'var(--color-text-tertiary)', margin: 0 }}>No data available.</p>
+                  ) : type === 'structured' ? (
+                    <SignalGrid signals={evidence[id]} />
+                  ) : (
+                    <FormattedText text={evidence[id]} />
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
