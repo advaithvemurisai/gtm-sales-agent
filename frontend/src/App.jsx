@@ -4,6 +4,8 @@ import VerdictCard from './components/VerdictCard';
 import EvidencePanel from './components/EvidencePanel';
 import './App.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
 function App() {
   const [phase, setPhase] = useState('input'); // input, chat, result
   const [companyData, setCompanyData] = useState(null);
@@ -15,7 +17,7 @@ function App() {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:8000/analyze', {
+      const response = await fetch(`${API_BASE_URL}/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
