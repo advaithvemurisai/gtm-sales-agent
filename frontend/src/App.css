@@ -15,6 +15,9 @@
   --color-border-success: #8fc5a6;
   --color-text-danger: #a32f2f;
   --color-text-warning: #76550b;
+  --color-on-accent: #ffffff;
+  --color-background-danger: #fcebea;
+  --color-border-danger: #e2a8a5;
   --font-sans: 'Avenir Next', Avenir, 'Trebuchet MS', sans-serif;
   --border-radius-md: 8px;
   color-scheme: light;
@@ -38,6 +41,9 @@
     --color-border-success: #5b9d73;
     --color-text-danger: #ffaaa2;
     --color-text-warning: #f3cf70;
+    --color-on-accent: #10231a;
+    --color-background-danger: #3b2323;
+    --color-border-danger: #7a3b38;
     color-scheme: dark;
   }
 }
@@ -68,10 +74,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visib
 .form-heading p:last-child, .form-note { color: var(--color-text-secondary); font-size: 13px; line-height: 1.55; margin-top: .5rem; }
 .research-form label { display: grid; gap: 7px; margin-top: 1rem; color: var(--color-text-primary); font-size: 13px; font-weight: 700; }
 .research-form label span { color: var(--color-text-tertiary); font-weight: 400; }
-.research-form input, .research-form textarea { width: 100%; border: 1px solid var(--color-border-primary); border-radius: 6px; padding: 11px 12px; background: var(--color-background-primary); color: var(--color-text-primary); line-height: 1.5; }
+.research-form input, .research-form textarea { font-weight: 400; width: 100%; border: 1px solid var(--color-border-primary); border-radius: 6px; padding: 11px 12px; background: var(--color-background-primary); color: var(--color-text-primary); line-height: 1.5; }
 .research-form textarea { resize: vertical; }
 .research-form input::placeholder, .research-form textarea::placeholder { color: var(--color-text-tertiary); opacity: 1; }
-.primary-button { border: 0; background: var(--color-accent); color: #fff; font-weight: 700; border-radius: 6px; padding: 11px 14px; cursor: pointer; }
+.primary-button { border: 0; background: var(--color-accent); color: var(--color-on-accent); font-weight: 700; border-radius: 6px; padding: 11px 14px; cursor: pointer; }
 .research-button { display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; margin-top: 1.25rem; font-size: 15px; }
 .form-error { color: var(--color-text-danger); font-size: 13px; margin-top: 10px; }
 .eyebrow { color: var(--color-text-tertiary); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
@@ -101,7 +107,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visib
 .history-row strong { color: var(--color-text-secondary); font-size: 12px; }
 .notice { display: flex; justify-content: center; flex-wrap: wrap; gap: .35rem; padding: .85rem 1rem; font-size: 14px; }
 .notice-paused { background: var(--color-background-success); border-bottom: 1px solid var(--color-border-success); color: var(--color-text-primary); }
-.notice-error { background: #fcebea; border-bottom: 1px solid #e2a8a5; color: var(--color-text-danger); }
+.notice-error { background: var(--color-background-danger); border-bottom: 1px solid var(--color-border-danger); color: var(--color-text-danger); }
 .notice a, .notice button { color: var(--color-accent); font-weight: 700; background: none; border: 0; cursor: pointer; text-decoration: underline; }
 .muted-text { color: var(--color-text-secondary); font-size: 12px; }
 .result-actions { display: flex; align-items: center; gap: 10px; margin-top: 1rem; }

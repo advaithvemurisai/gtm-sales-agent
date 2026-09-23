@@ -92,13 +92,13 @@ def test_pipeline_handles_string_search_results_and_parent_failure(monkeypatch):
         "system",
     )
 
-    monkeypatch.setattr("backend.agent.pipeline.get_tech_signals", lambda name: {
+    monkeypatch.setattr("backend.agent.pipeline.get_tech_signals", lambda name, website=None: {
         "raw_data": {"technologies": {}, "error": None}, "summary": None,
     })
-    monkeypatch.setattr("backend.agent.pipeline.get_hiring_signals", lambda name: {
+    monkeypatch.setattr("backend.agent.pipeline.get_hiring_signals", lambda name, website=None: {
         "raw_data": {"open_positions": [], "error": None}, "summary": None,
     })
-    monkeypatch.setattr("backend.agent.pipeline.get_web_search_data", lambda name: {
+    monkeypatch.setattr("backend.agent.pipeline.get_web_search_data", lambda name, website=None: {
         "raw_data": {
             "fundamentals": "fundamentals text",
             "news": "news text",

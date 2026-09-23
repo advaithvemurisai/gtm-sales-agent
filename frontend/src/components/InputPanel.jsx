@@ -45,7 +45,7 @@ function InputPanel({ onAnalyze, companyName, setCompanyName, productDescription
 
       <section className="landing-section example-section" id="example" aria-labelledby="example-title">
         <div className="section-intro"><p className="eyebrow">See a real result</p><h2 id="example-title">A useful answer, not another list of accounts.</h2></div>
-        {examples.length > 0 ? <div className="example-tabs" role="tablist" aria-label="Saved examples">{examples.map((example) => <button key={example.id} type="button" onClick={() => onSelectExample(example)}>{example.label}<small>Saved example · analyzed {example.analyzed_at}</small></button>)}</div> : <figure className="example-image"><img src="/result.png" alt="Example account research result" /><figcaption>Example result</figcaption></figure>}
+        {examples.length > 0 ? <div className="example-tabs" role="group" aria-label="Saved examples">{examples.map((example) => <button key={example.id} type="button" onClick={() => onSelectExample(example)}>{example.label}<small>Saved example · analyzed {example.analyzed_at}</small></button>)}</div> : <figure className="example-image"><img src="/result.png" alt="Example account research result" /><figcaption>Example result</figcaption></figure>}
       </section>
 
       <section className="landing-section how-section" id="how-it-works" aria-labelledby="how-title">

@@ -15,7 +15,7 @@ from backend.config import MAX_COMPANY_NAME_LENGTH, MAX_PRODUCT_DESCRIPTION_LENG
 from backend.errors import is_billing_error
 from backend.agent.icp import infer_icp_signals
 from backend.agent.pipeline import run_evaluation_pipeline
-from backend.agent.verdict import format_verdict_display
+from backend.agent.response import build_analysis_response
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("gtm_agent.api")
@@ -98,47 +98,16 @@ def analyze(request: AnalyzeRequest, http_request: Request) -> AnalyzeResponse:
             company_website=request.company_website,
         )
 
-        # Format response
-        verdict = format_verdict_display(result["verdict"])
-
-        evidence = {
-            "company_signals": result["web_search"]["raw_data"].get("company_signals", {}),
-            "technology": result["technology"]["summary"],
-            "hiring": result["hiring"]["summary"],
-            "web_search": result["web_search"]["summary"],
-            "source_errors": {
-                source: result[source]["raw_data"].get("error")
-                for source in ("technology", "hiring", "web_search")
-                if result[source]["raw_data"].get("error")
-            },
-            "source_urls": {
-                source: result[source]["raw_data"].get("source_urls", [])
-                for source in ("technology", "hiring", "web_search")
-            },
-        }
-
-        summary = {
-            "decision": verdict["decision"],
-            "signal_count": len(verdict.get("signals", [])),
-            "reasoning_preview": verdict.get("reasoning", "")[:220],
-            "evidence_sources": ["company_signals", "technology", "hiring", "web_search"],
-            "confidence": verdict.get("confidence", "unknown"),
-        }
+        response = build_analysis_response(request.company_name, icp_profile, result)
 
         logger.info(
             "Analyze response prepared for company=%s with decision=%s duration_ms=%.1f",
             request.company_name,
-            verdict["decision"],
+            response["verdict"]["decision"],
             (time.perf_counter() - started_at) * 1000,
         )
 
-        return AnalyzeResponse(
-            company_name=request.company_name,
-            icp_profile=icp_profile,
-            verdict=verdict,
-            evidence=evidence,
-            summary=summary,
-        )
+        return AnalyzeResponse(**response)
 
     except Exception as e:
         logger.exception(

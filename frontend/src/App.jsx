@@ -46,8 +46,13 @@ function loadingMessage(seconds) {
   return 'Writing the verdict. Slower searches can take up to two minutes...';
 }
 
+const NETWORK_ERROR = "Couldn't reach the server. It may be starting up; try again in a minute.";
+
+function requestError(message, code) {
+  return Object.assign(new Error(message), { code });
+}
+
 function errorMessage(payload) {
-  if (payload?.detail?.code === 'demo_paused') return payload.detail.detail;
   if (typeof payload?.detail === 'string') return payload.detail;
   if (Array.isArray(payload?.detail)) return 'Some of the details were not accepted. Check the criteria and try again.';
   return 'Analysis failed. Please try again.';
@@ -149,19 +154,18 @@ function App() {
     setLastRequest({ ...data, icp_profile: icpProfile });
 
     try {
+      // Only a failed fetch means the server was unreachable; other errors keep their own message.
       const response = await fetch(`${API_BASE_URL}/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ ...data, icp_profile: icpProfile }),
-      });
+      }).catch(() => { throw requestError(NETWORK_ERROR, 'network'); });
 
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
-        const error = new Error(errorMessage(payload));
-        error.code = payload?.code || payload?.detail?.code;
-        throw error;
+        throw requestError(errorMessage(payload), payload?.code || 'server');
       }
 
       const result = await response.json();
@@ -171,10 +175,7 @@ function App() {
         ...current.filter((item) => item.company_name !== result.company_name),
       ].slice(0, HISTORY_LIMIT));
     } catch (err) {
-      const message = err.name === 'TypeError' || err.message === 'Failed to fetch'
-        ? "Couldn't reach the server. It may be starting up; try again in a minute."
-        : err.message;
-      setError({ message, code: err.code });
+      setError({ message: err.code ? err.message : 'Something went wrong showing the result. Please try again.', code: err.code || 'client' });
       console.error('Error:', err);
     } finally {
       setLoading(false);
@@ -220,7 +221,8 @@ function App() {
       {error && (
         <div className={`notice ${error.code === 'demo_paused' ? 'notice-paused' : 'notice-error'}`} role="alert">
           <span>{error.code === 'demo_paused' ? 'Live research is paused right now. ' : error.message}</span>
-          {error.code === 'demo_paused' ? <a href="#example">See a real example below.</a> : error.message === "Couldn't reach the server. It may be starting up; try again in a minute." ? <button type="button" onClick={() => lastRequest && handleAnalyze(lastRequest, lastRequest.icp_profile)}>Try again</button> : null}
+          {error.code === 'demo_paused' && phase === 'input' && <a href="#example">See a real example below.</a>}
+          {error.code === 'network' && lastRequest && <button type="button" onClick={() => handleAnalyze(lastRequest, lastRequest.icp_profile)}>Try again</button>}
         </div>
       )}
 

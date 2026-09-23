@@ -53,7 +53,7 @@ function VerdictCard({ verdict, company }) {
       </div>
 
       {verdict?.reasoning && (
-          <div style={{ padding: '1.1rem 1.1rem 0.9rem', borderRadius: 'var(--border-radius-md)', background: 'var(--color-background-tertiary)', marginBottom: '1.25rem' }}>
+        <div style={{ padding: '1.1rem 1.1rem 0.9rem', borderRadius: 'var(--border-radius-md)', background: 'var(--color-background-tertiary)', marginBottom: '1.25rem' }}>
           <FormattedText text={verdict.reasoning} accentColor={styles.iconColor} />
         </div>
       )}

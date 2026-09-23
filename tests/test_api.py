@@ -42,6 +42,21 @@ def test_analyze_returns_paused_for_credit_balance_error(monkeypatch):
     assert response.json() == {"detail": "Live research is paused right now.", "code": "demo_paused"}
 
 
+def test_permission_error_is_not_reported_as_paused(monkeypatch):
+    class PermissionError403(Exception):
+        status_code = 403
+
+    monkeypatch.setattr("backend.app._request_windows", {})
+    monkeypatch.setattr("backend.app.infer_icp_signals", lambda description: {})
+    monkeypatch.setattr(
+        "backend.app.run_evaluation_pipeline",
+        lambda **kwargs: (_ for _ in ()).throw(PermissionError403("API key lacks permission for this model")),
+    )
+    response = TestClient(app).post("/analyze", json={"company_name": "Example", "product_description": "B2B analytics"})
+
+    assert response.status_code == 500
+
+
 def test_analyze_has_a_rate_limit(monkeypatch):
     monkeypatch.setattr("backend.app._request_windows", {"analyze": __import__("collections").deque()})
     monkeypatch.setattr("backend.app.infer_icp_signals", lambda description: {})

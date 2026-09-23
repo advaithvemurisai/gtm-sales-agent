@@ -39,14 +39,9 @@ def run_evaluation_pipeline(
     system_prompt = load_prompt("evaluation_system_prompt.txt")
 
     with ThreadPoolExecutor(max_workers=3) as executor:
-        if company_website:
-            technology_future = executor.submit(get_tech_signals, company_name, company_website)
-            hiring_future = executor.submit(get_hiring_signals, company_name, company_website)
-            web_search_future = executor.submit(get_web_search_data, company_name, company_website)
-        else:
-            technology_future = executor.submit(get_tech_signals, company_name)
-            hiring_future = executor.submit(get_hiring_signals, company_name)
-            web_search_future = executor.submit(get_web_search_data, company_name)
+        technology_future = executor.submit(get_tech_signals, company_name, company_website)
+        hiring_future = executor.submit(get_hiring_signals, company_name, company_website)
+        web_search_future = executor.submit(get_web_search_data, company_name, company_website)
         technology_result = technology_future.result()
         hiring_result = hiring_future.result()
         web_search_result = web_search_future.result()

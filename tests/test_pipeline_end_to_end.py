@@ -21,17 +21,17 @@ def test_run_evaluation_pipeline_and_format_verdict(monkeypatch):
         '- Technology signals show legacy ERP and low cloud adoption\n'
     )
 
-    monkeypatch.setattr('backend.agent.pipeline.get_tech_signals', lambda company_name: {
+    monkeypatch.setattr('backend.agent.pipeline.get_tech_signals', lambda company_name, company_website=None: {
         'raw_data': {'company_name': company_name, 'technologies': ['ERP']},
         'summary': 'Technology summary placeholder.',
     })
 
-    monkeypatch.setattr('backend.agent.pipeline.get_hiring_signals', lambda company_name: {
+    monkeypatch.setattr('backend.agent.pipeline.get_hiring_signals', lambda company_name, company_website=None: {
         'raw_data': {'company_name': company_name, 'roles': ['Operations']},
         'summary': 'Hiring summary placeholder.',
     })
 
-    monkeypatch.setattr('backend.agent.pipeline.get_web_search_data', lambda company_name: {
+    monkeypatch.setattr('backend.agent.pipeline.get_web_search_data', lambda company_name, company_website=None: {
         'raw_data': {
             'fundamentals': {'company_name': company_name, 'funding_stage': 'Seed'},
             'news': {'headline': 'Recent market update'},
