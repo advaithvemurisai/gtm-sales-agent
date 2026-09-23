@@ -47,11 +47,10 @@ function VerdictCard({ verdict, company }) {
         </div>
       </div>
 
-      {verdict?.summary && (
-        <div style={{ marginBottom: '1rem' }}>
-          <FormattedText text={verdict.summary} accentColor={styles.iconColor} />
-        </div>
-      )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1rem', color: 'var(--color-text-secondary)', fontSize: 13 }}>
+        <span>Confidence</span>
+        <strong style={{ color: styles.iconColor, textTransform: 'capitalize' }}>{verdict?.confidence || 'medium'}</strong>
+      </div>
 
       {verdict?.reasoning && (
         <div style={{ padding: '1.1rem 1.1rem 0.9rem', borderRadius: 'var(--border-radius-md)', background: 'rgba(255, 255, 255, 0.02)', marginBottom: '1.25rem' }}>

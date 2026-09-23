@@ -35,7 +35,7 @@ function SignalGrid({ signals }) {
 const SECTIONS = [
   { id: 'company_signals', title: 'Company Signals', icon: 'ti-chart-infographic', type: 'structured' },
   { id: 'web_search', title: 'Web Search', icon: 'ti-world-search', type: 'text' },
-  { id: 'builtwith', title: 'Tech Stack', icon: 'ti-stack-2', type: 'text' },
+  { id: 'builtwith', title: 'Technology Signals', icon: 'ti-stack-2', type: 'text' },
   { id: 'careers', title: 'Hiring Signals', icon: 'ti-users', type: 'text' },
 ];
 
@@ -55,6 +55,11 @@ function EvidencePanel({ evidence }) {
       </div>
 
       <div style={{ display: 'grid', gap: 12 }}>
+        {Object.entries(evidence?.source_errors || {}).map(([source, error]) => (
+          <div key={source} role="alert" style={{ padding: '12px 14px', border: '1px solid rgba(210, 153, 34, 0.35)', background: 'rgba(210, 153, 34, 0.08)', borderRadius: 8, color: '#d29922', fontSize: 13 }}>
+            {source} evidence was unavailable. The verdict may be less reliable.
+          </div>
+        ))}
         {SECTIONS.map(({ id, title, icon, type }) => {
           const isOpen = expanded === id;
           const hasData = evidence && (type === 'structured' ? evidence[id] : evidence[id]);
@@ -82,6 +87,11 @@ function EvidencePanel({ evidence }) {
                     <SignalGrid signals={evidence[id]} />
                   ) : (
                     <FormattedText text={evidence[id]} />
+                  )}
+                  {(evidence?.source_urls?.[id] || []).length > 0 && (
+                    <div style={{ marginTop: 14, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      {evidence.source_urls[id].map((url) => <a key={url} href={url} target="_blank" rel="noreferrer" style={{ color: '#58a6ff', fontSize: 12 }}>View source</a>)}
+                    </div>
                   )}
                 </div>
               )}

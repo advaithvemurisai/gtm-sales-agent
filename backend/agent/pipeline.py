@@ -3,11 +3,13 @@ import os
 import json
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 from anthropic import Anthropic
 from backend.telemetry import log_anthropic_usage, timed_operation
 from backend.tools.builtwith import get_builtwith_data
 from backend.tools.careers_scraper import get_careers_page_data
 from backend.tools.web_search import get_web_search_data
+from backend.config import SONNET_MODEL
 
 logger = logging.getLogger("gtm_agent.pipeline")
 
@@ -30,7 +32,7 @@ def run_evaluation_pipeline(
     icp_profile: dict = None,
 ) -> dict:
     """
-    Run Phase 2 evaluation pipeline with four tools in sequence.
+    Run the evaluation pipeline with independent evidence sources in parallel.
 
     Args:
         company_name: The company name
@@ -42,45 +44,35 @@ def run_evaluation_pipeline(
     logger.info("Starting evaluation pipeline for company=%s", company_name)
     system_prompt = load_prompt("evaluation_system_prompt.txt")
 
-    # Step 1: Crunchbase retired - company signals extracted from web search
-    crunchbase_result = {
-        "raw_data": {"note": "replaced by web search signal extraction"},
-        "summary": "Funding and headcount data extracted via web search."
-    }
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        builtwith_future = executor.submit(get_builtwith_data, company_name)
+        careers_future = executor.submit(get_careers_page_data, company_name)
+        web_search_future = executor.submit(get_web_search_data, company_name)
+        builtwith_result = builtwith_future.result()
+        careers_result = careers_future.result()
+        web_search_result = web_search_future.result()
 
-    # Step 2: BuiltWith data
-    with timed_operation(logger, "fetch_builtwith", company=company_name):
-        builtwith_result = get_builtwith_data(company_name)
-    with timed_operation(logger, "summarize_builtwith", company=company_name):
-        builtwith_summary = _summarize_tool_result(
-            builtwith_result, "BuiltWith", system_prompt
-        )
-    builtwith_result["summary"] = builtwith_summary
-
-    # Step 3: Careers page scraper
-    with timed_operation(logger, "fetch_careers", company=company_name):
-        careers_result = get_careers_page_data(company_name)
-    with timed_operation(logger, "summarize_careers", company=company_name):
-        careers_summary = _summarize_tool_result(
-            careers_result, "Careers Page", system_prompt
-        )
-    careers_result["summary"] = careers_summary
-
-    # Step 4: Web search (two queries: fundamentals + news)
-    with timed_operation(logger, "fetch_web_search", company=company_name):
-        web_search_result = get_web_search_data(company_name)
-    with timed_operation(logger, "summarize_company_fundamentals", company=company_name):
-        fundamentals_summary = _summarize_tool_result(
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        builtwith_summary_future = executor.submit(_summarize_tool_result, builtwith_result, "Technology Signals", system_prompt)
+        careers_summary_future = executor.submit(_summarize_tool_result, careers_result, "Hiring Signals", system_prompt)
+        fundamentals_summary_future = executor.submit(
+            _summarize_tool_result,
             {"raw_data": web_search_result["raw_data"]["fundamentals"]},
             "Company Fundamentals",
-            system_prompt
+            system_prompt,
         )
-    with timed_operation(logger, "summarize_recent_news", company=company_name):
-        news_summary = _summarize_tool_result(
+        news_summary_future = executor.submit(
+            _summarize_tool_result,
             {"raw_data": web_search_result["raw_data"]["news"]},
             "Recent News",
-            system_prompt
+            system_prompt,
         )
+        builtwith_summary = builtwith_summary_future.result()
+        careers_summary = careers_summary_future.result()
+        fundamentals_summary = fundamentals_summary_future.result()
+        news_summary = news_summary_future.result()
+    builtwith_result["summary"] = builtwith_summary
+    careers_result["summary"] = careers_summary
     web_search_result["summary"] = f"{fundamentals_summary}\n\n{news_summary}"
     web_search_summary = web_search_result["summary"]
 
@@ -106,7 +98,6 @@ def run_evaluation_pipeline(
     return {
         "company_name": company_name,
         "icp_profile": icp_profile,
-        "crunchbase": crunchbase_result,
         "builtwith": builtwith_result,
         "careers": careers_result,
         "web_search": web_search_result,
@@ -119,9 +110,13 @@ def _summarize_tool_result(result: dict, tool_name: str, system_prompt: str) -> 
     Use LLM to summarize a tool result.
     """
     logger.info("Summarizing %s data", tool_name)
+    if result.get("raw_data", {}).get("error"):
+        error = result["raw_data"]["error"]
+        logger.warning("Skipping summary for failed %s source: %s", tool_name, error)
+        return f"SOURCE FAILED: {tool_name}. No evidence was available from this source."
     prompt = f"Summarize this {tool_name} data in 2-3 sentences focusing on signals relevant to sales fit:\n\n{json.dumps(result['raw_data'], indent=2)}"
 
-    model = "claude-sonnet-4-6"
+    model = SONNET_MODEL
     started_at = time.perf_counter()
     response = _get_client().messages.create(
         model=model,
@@ -180,7 +175,7 @@ def _generate_verdict(
         company_signals_revenue_estimate=company_signals.get("revenue_estimate", "Unknown"),
     )
 
-    model = "claude-sonnet-4-6"
+    model = SONNET_MODEL
     started_at = time.perf_counter()
     response = _get_client().messages.create(
         model=model,
@@ -208,12 +203,12 @@ def _parse_verdict(verdict_text: str) -> dict:
     """
     verdict = {
         "raw_text": verdict_text,
-        "decision": "WATCH",  # Default
+        "decision": None,
         "reasoning": "",
         "signals": []
     }
 
-    lines = [line.strip() for line in verdict_text.splitlines() if line.strip()]
+    lines = [re.sub(r"[*_`]", "", line).strip() for line in verdict_text.splitlines() if line.strip()]
 
     for i, line in enumerate(lines):
         if re.match(r"^(VERDICT|DECISION)\s*:", line, re.I):
@@ -244,6 +239,14 @@ def _parse_verdict(verdict_text: str) -> dict:
                         verdict["signals"].append(signal)
                 elif signal_line and not signal_line.startswith("-"):
                     break
+
+        elif re.match(r"^CONFIDENCE\s*:", line, re.I):
+            confidence = line.split(":", 1)[1].strip().lower()
+            if confidence in {"low", "medium", "high"}:
+                verdict["confidence"] = confidence
+
+    if not verdict["decision"] or not verdict["reasoning"]:
+        raise ValueError("Verdict response was missing a decision or reasoning section")
 
     verdict["reasoning"] = re.sub(r"\s+", " ", verdict["reasoning"]).strip()
     verdict["signals"] = [re.sub(r"\s+", " ", signal).strip() for signal in verdict["signals"] if re.sub(r"\s+", " ", signal).strip()]

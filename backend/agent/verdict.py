@@ -16,6 +16,7 @@ def format_verdict_display(verdict: Dict[str, Any]) -> Dict[str, Any]:
         "signals": signals,
         "color": _get_verdict_color(decision),
         "summary": _build_verdict_summary(decision, reasoning, signals),
+        "confidence": _clean_text(verdict.get("confidence", "medium")).lower(),
     }
 
 

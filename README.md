@@ -1,61 +1,54 @@
-# gtm-sales-agent
+# GTM Agent
 
-## Hosting
+GTM Agent is a sales intelligence demo for founders, GTM engineers, and account executives. Enter what you sell and a target company; it searches public web evidence, compares the signals with an inferred ICP, and returns a `PURSUE`, `WATCH`, or `DEPRIORITIZE` recommendation with confidence, citations, and failed-source warnings.
 
-This app has two deployable parts:
+The deployed app is the primary product walkthrough; add a current result-screen capture here after the public demo URL is available.
 
-- `backend/`: FastAPI API
-- `frontend/`: Vite React app
+## Architecture
 
-### Backend on Render
-
-Create a new Render Web Service from this GitHub repo.
-
-Settings:
-
-- Root directory: leave blank, or use repo root
-- Runtime: Python
-- Build command: `pip install -r requirements.txt`
-- Start command: `uvicorn backend.app:app --host 0.0.0.0 --port $PORT`
-
-Environment variables:
-
-- `ANTHROPIC_API_KEY`: your Anthropic API key
-- `ALLOWED_ORIGINS`: your frontend URL, for example `https://your-app.vercel.app`
-
-After deploy, test:
-
-```bash
-curl https://your-backend.onrender.com/health
+```mermaid
+flowchart LR
+	UI[React frontend] --> API[FastAPI /analyze]
+	API --> ICP[Infer ICP]
+	API --> Sources[Parallel web searches]
+	Sources --> Tech[Technology signals]
+	Sources --> Hiring[Hiring signals]
+	Sources --> Company[Fundamentals and news]
+	ICP --> Verdict[Verdict model]
+	Tech --> Verdict
+	Hiring --> Verdict
+	Company --> Verdict
+	Verdict --> UI
 ```
 
-### Frontend on Vercel
+## Verdict rules
 
-Create a new Vercel project from this GitHub repo.
+The model evaluates only ICP fields that were inferred with a value. It compares headcount and funding stage, checks named technology and hiring signals, and uses revenue or funding as a budget proxy. Missing or failed sources must be called out and lower confidence; they are never treated as negative evidence.
 
-Settings:
+## Local development
 
-- Root directory: `frontend`
-- Build command: `npm run build`
-- Output directory: `dist`
-
-Environment variables:
-
-- `VITE_API_BASE_URL`: your backend URL, for example `https://your-backend.onrender.com`
-
-Redeploy the frontend after setting `VITE_API_BASE_URL`.
-
-### Local development
-
-Backend:
+Set `ANTHROPIC_API_KEY` in `.env`, then run:
 
 ```bash
+pip install -r requirements.txt
 uvicorn backend.app:app --reload --port 8000
+cd frontend && npm install && npm run dev
 ```
 
-Frontend:
+For deployment, run the backend with `uvicorn backend.app:app --host 0.0.0.0 --port $PORT` and set `VITE_API_BASE_URL` in the frontend deployment. Configure `ALLOWED_ORIGINS` to the exact frontend origin.
+
+## Tests
 
 ```bash
-cd frontend
-npm run dev
+pytest
 ```
+
+## Known limitations
+
+- Search quality depends on Anthropic web-search availability and public company information.
+- Technology and hiring signals are web evidence, not direct BuiltWith or careers API data.
+- The demo uses one shared API key, so production deployments should add authentication, durable rate limiting, usage budgets, and secret management.
+
+## Live demo
+
+Deployment URL: add the public frontend URL here after publishing.

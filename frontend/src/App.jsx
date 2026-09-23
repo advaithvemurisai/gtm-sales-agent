@@ -11,10 +11,16 @@ function App() {
   const [companyData, setCompanyData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [loadingStep, setLoadingStep] = useState(0);
 
   const handleAnalyze = async (data) => {
     setLoading(true);
     setError(null);
+    const progress = [
+      setTimeout(() => setLoadingStep(1), 2500),
+      setTimeout(() => setLoadingStep(2), 8000),
+      setTimeout(() => setLoadingStep(3), 16000),
+    ];
 
     try {
       const response = await fetch(`${API_BASE_URL}/analyze`, {
@@ -26,7 +32,8 @@ function App() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to analyze company');
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.detail || 'Analysis failed. Please try again.');
       }
 
       const result = await response.json();
@@ -36,7 +43,9 @@ function App() {
       setError(err.message);
       console.error('Error:', err);
     } finally {
+      progress.forEach(clearTimeout);
       setLoading(false);
+      setLoadingStep(0);
     }
   };
 
@@ -57,7 +66,10 @@ function App() {
       {loading && (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', flexDirection: 'column', gap: 16, padding: '0 1rem' }}>
           <div className="animate-spin" style={{ width: 32, height: 32, border: '2px solid var(--color-border-primary)', borderTopColor: 'var(--color-text-success)', borderRadius: '50%' }} />
-          <p style={{ color: 'var(--color-text-secondary)', fontSize: 14, textAlign: 'center', maxWidth: 360 }}>Running web searches, extracting signals, checking tech stack...</p>
+          <p style={{ color: 'var(--color-text-primary)', fontSize: 15, textAlign: 'center', maxWidth: 360, margin: 0 }}>Analyzing signals</p>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: 13, textAlign: 'center', maxWidth: 360, margin: 0 }}>
+            {['Finding company context...', 'Checking technology and hiring signals...', 'Comparing evidence with your ICP...', 'Writing the sales verdict...'][loadingStep]}
+          </p>
         </div>
       )}
 

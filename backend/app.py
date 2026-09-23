@@ -1,24 +1,29 @@
 import logging
 import os
 import time
+from collections import defaultdict, deque
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from dotenv import load_dotenv
-from backend.agent.icp_conversation import run_icp_conversation, infer_icp_signals
+load_dotenv()
+
+from backend.config import MAX_COMPANY_NAME_LENGTH, MAX_PRODUCT_DESCRIPTION_LENGTH
+from backend.agent.icp_conversation import infer_icp_signals
 from backend.agent.pipeline import run_evaluation_pipeline
 from backend.agent.verdict import format_verdict_display
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("gtm_agent.api")
-
-load_dotenv()
+_request_windows = defaultdict(deque)
+_RATE_LIMIT = 5
+_RATE_WINDOW_SECONDS = 60
 
 app = FastAPI(title="GTM Sales Intelligence Agent")
 
 allowed_origins = [
     origin.strip()
-    for origin in os.getenv("ALLOWED_ORIGINS", "*").split(",")
+    for origin in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
     if origin.strip()
 ]
 
@@ -26,21 +31,15 @@ allowed_origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_credentials=True,
+    allow_credentials=allowed_origins != ["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
 class AnalyzeRequest(BaseModel):
-    company_name: str
-    product_description: str
-
-
-class ChatRequest(BaseModel):
-    company_name: str
-    product_description: str
-    message: str
+    company_name: str = Field(min_length=1, max_length=MAX_COMPANY_NAME_LENGTH)
+    product_description: str = Field(min_length=1, max_length=MAX_PRODUCT_DESCRIPTION_LENGTH)
 
 
 class AnalyzeResponse(BaseModel):
@@ -58,6 +57,14 @@ async def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
     with a default ICP profile.
     """
     started_at = time.perf_counter()
+    client_key = "analyze"
+    now = time.monotonic()
+    window = _request_windows[client_key]
+    while window and now - window[0] > _RATE_WINDOW_SECONDS:
+        window.popleft()
+    if len(window) >= _RATE_LIMIT:
+        raise HTTPException(status_code=429, detail="Too many analysis requests. Please try again shortly.")
+    window.append(now)
     logger.info("Analyze request received for company=%s", request.company_name)
     try:
         # Infer all ICP fields from product description - nothing hardcoded
@@ -78,6 +85,15 @@ async def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
             "builtwith": result["builtwith"]["summary"],
             "careers": result["careers"]["summary"],
             "web_search": result["web_search"]["summary"],
+            "source_errors": {
+                source: result[source]["raw_data"].get("error")
+                for source in ("builtwith", "careers", "web_search")
+                if result[source]["raw_data"].get("error")
+            },
+            "source_urls": {
+                source: result[source]["raw_data"].get("source_urls", [])
+                for source in ("builtwith", "careers", "web_search")
+            },
         }
 
         summary = {
@@ -85,6 +101,7 @@ async def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
             "signal_count": len(verdict.get("signals", [])),
             "reasoning_preview": verdict.get("reasoning", "")[:220],
             "evidence_sources": ["company_signals", "builtwith", "careers", "web_search"],
+            "confidence": verdict.get("confidence", "medium"),
         }
 
         logger.info(
@@ -107,20 +124,7 @@ async def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
             request.company_name,
             (time.perf_counter() - started_at) * 1000,
         )
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/chat")
-async def chat(request: ChatRequest) -> dict:
-    """
-    Handle ICP conversation messages (Phase 1).
-    For MVP, this is a placeholder that returns the message back.
-    """
-    # TODO: Implement interactive ICP conversation
-    return {
-        "message": f"You said: {request.message}",
-        "phase": "icp"
-    }
+        raise HTTPException(status_code=500, detail="Analysis failed. Check the server logs for details.")
 
 
 @app.get("/health")

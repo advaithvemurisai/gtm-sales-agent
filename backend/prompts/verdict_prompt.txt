@@ -50,3 +50,5 @@ KEY SIGNALS:
 - [Signal 1 - name the source and ICP field it relates to]
 - [Signal 2]
 - [Signal 3]
+
+CONFIDENCE: [LOW|MEDIUM|HIGH, based on evidence completeness and source agreement]

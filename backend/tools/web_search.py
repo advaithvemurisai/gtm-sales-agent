@@ -5,14 +5,15 @@ import time
 from anthropic import Anthropic
 from typing import Dict, Any
 from backend.telemetry import log_anthropic_usage
+from backend.config import HAIKU_MODEL, SONNET_MODEL
 
 
 logger = logging.getLogger(__name__)
 
 
-def _run_search(query: str, client: Anthropic) -> str:
+def _run_search(query: str, client: Anthropic) -> tuple[str, list[str]]:
     """Run a single web search and return concatenated text results."""
-    model = "claude-sonnet-4-6"
+    model = SONNET_MODEL
     started_at = time.perf_counter()
     response = client.messages.create(
         model=model,
@@ -27,10 +28,9 @@ def _run_search(query: str, client: Anthropic) -> str:
         started_at=started_at,
         response=response,
     )
-    return " ".join([
-        block.text for block in response.content
-        if hasattr(block, "text")
-    ])
+    text = " ".join(block.text for block in response.content if getattr(block, "type", None) == "text")
+    citations = [citation.url for block in response.content for citation in getattr(block, "citations", []) if getattr(citation, "url", None)]
+    return text, citations
 
 
 def parse_company_signals(company_name: str, fundamentals_text: str, client: Anthropic) -> dict:
@@ -51,7 +51,7 @@ Only extract what is explicitly stated. Use null or Unknown if not found.
 Text:
 {fundamentals_text}"""
 
-    model = "claude-haiku-4-5-20251001"
+    model = HAIKU_MODEL
     started_at = time.perf_counter()
     response = client.messages.create(
         model=model,
@@ -90,6 +90,7 @@ def get_web_search_data(company_name: str) -> Dict[str, Any]:
         "fundamentals": "",
         "news": "",
         "company_signals": {},
+        "source_urls": [],
         "error": None
     }
 
@@ -98,22 +99,24 @@ def get_web_search_data(company_name: str) -> Dict[str, Any]:
             f'"{company_name}" company funding stage '
             f'employees headcount founded year revenue headquarters'
         )
-        fundamentals_text = _run_search(fundamentals_query, client)
+        fundamentals_text, fundamentals_urls = _run_search(fundamentals_query, client)
         web_search_data["fundamentals"] = fundamentals_text
 
         news_query = (
             f'"{company_name}" recent news 2024 2025 '
             f'hiring growth product launch partnerships'
         )
-        news_text = _run_search(news_query, client)
+        news_text, news_urls = _run_search(news_query, client)
         web_search_data["news"] = news_text
 
         web_search_data["company_signals"] = parse_company_signals(
             company_name, fundamentals_text, client
         )
+        web_search_data["source_urls"] = list(dict.fromkeys(fundamentals_urls + news_urls))
 
     except Exception as e:
         web_search_data["error"] = str(e)
+        logger.exception("Web search failed for %s", company_name)
 
     return {
         "raw_data": web_search_data,

@@ -5,6 +5,7 @@ from anthropic import Anthropic
 from typing import Dict, Any
 import logging
 from backend.telemetry import log_anthropic_usage
+from backend.config import HAIKU_MODEL, SONNET_MODEL
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +25,7 @@ Only include what is explicitly stated. Use empty arrays if no positions found.
 Text:
 {text}"""
 
-    model = "claude-haiku-4-5-20251001"
+    model = HAIKU_MODEL
     started_at = time.perf_counter()
     response = client.messages.create(
         model=model,
@@ -66,6 +67,7 @@ def get_careers_page_data(company_name: str, careers_url: str = None) -> Dict[st
         "hiring_departments": [],
         "hiring_active": False,
         "headcount_signal": "unknown",
+        "source_urls": [],
         "error": None
     }
 
@@ -75,7 +77,7 @@ def get_careers_page_data(company_name: str, careers_url: str = None) -> Dict[st
             f'OR "job openings" OR careers site:greenhouse.io OR site:lever.co '
             f'OR site:linkedin.com/jobs 2024 2025'
         )
-        model = "claude-sonnet-4-6"
+        model = SONNET_MODEL
         started_at = time.perf_counter()
         response = client.messages.create(
             model=model,
@@ -91,10 +93,8 @@ def get_careers_page_data(company_name: str, careers_url: str = None) -> Dict[st
             response=response,
         )
 
-        text = " ".join([
-            block.text for block in response.content
-            if hasattr(block, "text")
-        ])
+        text = " ".join(block.text for block in response.content if getattr(block, "type", None) == "text")
+        careers_data["source_urls"] = list(dict.fromkeys(citation.url for block in response.content for citation in getattr(block, "citations", []) if getattr(citation, "url", None)))
 
         extracted = _extract_hiring_fields(company_name, text, client)
         careers_data.update(extracted)

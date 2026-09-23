@@ -3,9 +3,13 @@ import logging
 import time
 from anthropic import Anthropic
 from backend.telemetry import log_anthropic_usage
+from backend.config import HAIKU_MODEL, SONNET_MODEL
 
 logger = logging.getLogger("gtm_agent.icp")
-client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+
+
+def _get_client():
+    return Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 
 def load_prompt(prompt_file: str) -> str:
@@ -57,9 +61,9 @@ def run_icp_conversation(company_name: str, product_description: str) -> tuple[s
         ]
 
         # Get LLM response
-        model = "claude-sonnet-4-6"
+        model = SONNET_MODEL
         started_at = time.perf_counter()
-        response = client.messages.create(
+        response = _get_client().messages.create(
             model=model,
             max_tokens=1024,
             system=system_prompt + "\n\n" + icp_prompt,
@@ -141,9 +145,9 @@ Rules:
 - Never guess wildly. Null is better than wrong."""
 
     try:
-        model = "claude-haiku-4-5-20251001"
+        model = HAIKU_MODEL
         started_at = time.perf_counter()
-        response = client.messages.create(
+        response = _get_client().messages.create(
             model=model,
             max_tokens=512,
             messages=[{"role": "user", "content": prompt}]
@@ -159,6 +163,7 @@ Rules:
         text = text.replace("```json", "").replace("```", "").strip()
         return json.loads(text)
     except Exception:
+        logger.exception("ICP inference failed")
         return {
             "target_company_size": None,
             "funding_stage": [],

@@ -5,6 +5,7 @@ from anthropic import Anthropic
 from typing import Dict, Any
 import logging
 from backend.telemetry import log_anthropic_usage
+from backend.config import HAIKU_MODEL, SONNET_MODEL
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ Only include technologies explicitly mentioned. Use empty arrays if not found.
 Text:
 {text}"""
 
-    model = "claude-haiku-4-5-20251001"
+    model = HAIKU_MODEL
     started_at = time.perf_counter()
     response = client.messages.create(
         model=model,
@@ -66,6 +67,7 @@ def get_builtwith_data(company_name: str) -> Dict[str, Any]:
     builtwith_data = {
         "company_name": company_name,
         "technologies": {},
+        "source_urls": [],
         "error": None
     }
 
@@ -75,7 +77,7 @@ def get_builtwith_data(company_name: str) -> Dict[str, Any]:
             f'site:stackshare.io OR site:builtwith.com OR "built with" OR "powered by" '
             f'OR engineering blog 2024 2025'
         )
-        model = "claude-sonnet-4-6"
+        model = SONNET_MODEL
         started_at = time.perf_counter()
         response = client.messages.create(
             model=model,
@@ -91,10 +93,8 @@ def get_builtwith_data(company_name: str) -> Dict[str, Any]:
             response=response,
         )
 
-        text = " ".join([
-            block.text for block in response.content
-            if hasattr(block, "text")
-        ])
+        text = " ".join(block.text for block in response.content if getattr(block, "type", None) == "text")
+        builtwith_data["source_urls"] = list(dict.fromkeys(citation.url for block in response.content for citation in getattr(block, "citations", []) if getattr(citation, "url", None)))
 
         builtwith_data["technologies"] = _extract_tech_stack(company_name, text, client)
 
