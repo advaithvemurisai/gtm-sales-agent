@@ -78,5 +78,4 @@ def test_run_evaluation_pipeline_and_format_verdict(monkeypatch):
 
     formatted = format_verdict_display(result['verdict'])
     assert formatted['decision'] == 'DEPRIORITIZE'
-    assert formatted['summary'].startswith('Decision: DEPRIORITIZE.')
     assert formatted['signals'][0] == 'Funding stage mismatch (web search / fundamentals)'

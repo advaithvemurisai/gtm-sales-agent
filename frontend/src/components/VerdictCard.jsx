@@ -49,7 +49,7 @@ function VerdictCard({ verdict, company }) {
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1rem', color: 'var(--color-text-secondary)', fontSize: 13 }}>
         <span>Confidence</span>
-        <strong style={{ color: styles.iconColor, textTransform: 'capitalize' }}>{verdict?.confidence || 'medium'}</strong>
+        <strong style={{ color: styles.iconColor, textTransform: 'capitalize' }}>{verdict?.confidence || 'unknown'}</strong>
       </div>
 
       {verdict?.reasoning && (

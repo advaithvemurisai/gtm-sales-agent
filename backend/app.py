@@ -2,7 +2,7 @@ import logging
 import os
 import time
 from collections import defaultdict, deque
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
@@ -23,7 +23,7 @@ app = FastAPI(title="GTM Sales Intelligence Agent")
 
 allowed_origins = [
     origin.strip()
-    for origin in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+    for origin in os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",")
     if origin.strip()
 ]
 
@@ -50,16 +50,16 @@ class AnalyzeResponse(BaseModel):
 
 
 @app.post("/analyze")
-async def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
+def analyze(request: AnalyzeRequest, http_request: Request) -> AnalyzeResponse:
     """
     Run full evaluation pipeline: ICP conversation -> Phase 2 evaluation -> verdict.
     For MVP, we skip the interactive ICP conversation and go straight to evaluation
     with a default ICP profile.
     """
     started_at = time.perf_counter()
-    client_key = "analyze"
+    client_key = http_request.client.host if http_request.client else "unknown"
     now = time.monotonic()
-    window = _request_windows[client_key]
+    window = _request_windows.setdefault(client_key, deque())
     while window and now - window[0] > _RATE_WINDOW_SECONDS:
         window.popleft()
     if len(window) >= _RATE_LIMIT:
@@ -101,7 +101,7 @@ async def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
             "signal_count": len(verdict.get("signals", [])),
             "reasoning_preview": verdict.get("reasoning", "")[:220],
             "evidence_sources": ["company_signals", "builtwith", "careers", "web_search"],
-            "confidence": verdict.get("confidence", "medium"),
+            "confidence": verdict.get("confidence", "unknown"),
         }
 
         logger.info(

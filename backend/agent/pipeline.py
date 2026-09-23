@@ -57,13 +57,13 @@ def run_evaluation_pipeline(
         careers_summary_future = executor.submit(_summarize_tool_result, careers_result, "Hiring Signals", system_prompt)
         fundamentals_summary_future = executor.submit(
             _summarize_tool_result,
-            {"raw_data": web_search_result["raw_data"]["fundamentals"]},
+            {"raw_data": web_search_result["raw_data"]["fundamentals"], "error": web_search_result["raw_data"].get("error")},
             "Company Fundamentals",
             system_prompt,
         )
         news_summary_future = executor.submit(
             _summarize_tool_result,
-            {"raw_data": web_search_result["raw_data"]["news"]},
+            {"raw_data": web_search_result["raw_data"]["news"], "error": web_search_result["raw_data"].get("error")},
             "Recent News",
             system_prompt,
         )
@@ -110,11 +110,12 @@ def _summarize_tool_result(result: dict, tool_name: str, system_prompt: str) -> 
     Use LLM to summarize a tool result.
     """
     logger.info("Summarizing %s data", tool_name)
-    if result.get("raw_data", {}).get("error"):
-        error = result["raw_data"]["error"]
+    raw_data = result.get("raw_data")
+    error = result.get("error") or (raw_data.get("error") if isinstance(raw_data, dict) else None)
+    if error:
         logger.warning("Skipping summary for failed %s source: %s", tool_name, error)
         return f"SOURCE FAILED: {tool_name}. No evidence was available from this source."
-    prompt = f"Summarize this {tool_name} data in 2-3 sentences focusing on signals relevant to sales fit:\n\n{json.dumps(result['raw_data'], indent=2)}"
+    prompt = f"Summarize this {tool_name} data in 2-3 sentences focusing on signals relevant to sales fit:\n\n{json.dumps(raw_data, indent=2)}"
 
     model = SONNET_MODEL
     started_at = time.perf_counter()
@@ -208,40 +209,47 @@ def _parse_verdict(verdict_text: str) -> dict:
         "signals": []
     }
 
-    lines = [re.sub(r"[*_`]", "", line).strip() for line in verdict_text.splitlines() if line.strip()]
+    lines = [line.strip() for line in verdict_text.splitlines() if line.strip()]
 
     for i, line in enumerate(lines):
-        if re.match(r"^(VERDICT|DECISION)\s*:", line, re.I):
-            decision_text = line.split(":", 1)[1].strip()
+        normalized_line = re.sub(
+            r"^[*_`]*(VERDICT|DECISION|REASONING|WHY|KEY SIGNALS|SIGNALS|KEY TAKEAWAYS|CONFIDENCE)[*_`]*\s*:[*_`]*",
+            lambda match: f"{match.group(1)}:",
+            line,
+            flags=re.I,
+        ).strip()
+        if re.match(r"^(VERDICT|DECISION)\s*:", normalized_line, re.I):
+            decision_text = normalized_line.split(":", 1)[1].strip()
             for option in ["PURSUE", "DEPRIORITIZE", "WATCH"]:
                 if option in decision_text.upper():
                     verdict["decision"] = option
                     break
 
-        elif re.match(r"^(REASONING|WHY)\s*:", line, re.I):
-            reasoning = line.split(":", 1)[1].strip()
+        elif re.match(r"^(REASONING|WHY)\s*:", normalized_line, re.I):
+            reasoning = normalized_line.split(":", 1)[1].strip()
             j = i + 1
             while j < len(lines):
                 next_line = lines[j]
-                if re.match(r"^(KEY SIGNALS|SIGNALS|KEY TAKEAWAYS)\s*:", next_line, re.I):
+                next_normalized_line = re.sub(r"^[*_`]*(KEY SIGNALS|SIGNALS|KEY TAKEAWAYS|CONFIDENCE)[*_`]*\s*:[*_`]*", r"\1:", next_line, flags=re.I)
+                if re.match(r"^(KEY SIGNALS|SIGNALS|KEY TAKEAWAYS|CONFIDENCE)\s*:", next_normalized_line, re.I):
                     break
                 if next_line:
                     reasoning += " " + next_line
                 j += 1
             verdict["reasoning"] = re.sub(r"\s+", " ", reasoning).strip()
 
-        elif re.match(r"^(KEY SIGNALS|SIGNALS|KEY TAKEAWAYS)\s*:", line, re.I):
+        elif re.match(r"^(KEY SIGNALS|SIGNALS|KEY TAKEAWAYS)\s*:", normalized_line, re.I):
             for j in range(i + 1, len(lines)):
                 signal_line = lines[j].strip()
                 if re.match(r"^[-•*]\s+", signal_line):
                     signal = signal_line[2:].strip()
                     if signal:
-                        verdict["signals"].append(signal)
+                        verdict["signals"].append(re.sub(r"\*\*([^*]+)\*\*", r"\1", signal))
                 elif signal_line and not signal_line.startswith("-"):
                     break
 
-        elif re.match(r"^CONFIDENCE\s*:", line, re.I):
-            confidence = line.split(":", 1)[1].strip().lower()
+        elif re.match(r"^CONFIDENCE\s*:", normalized_line, re.I):
+            confidence = normalized_line.split(":", 1)[1].strip().lower().split()[0]
             if confidence in {"low", "medium", "high"}:
                 verdict["confidence"] = confidence
 

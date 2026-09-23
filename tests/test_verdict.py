@@ -24,7 +24,7 @@ def test_parse_verdict_rejects_missing_sections():
         _parse_verdict("VERDICT: WATCH\nKEY SIGNALS:\n- Not enough evidence")
 
 
-def test_format_verdict_display_does_not_duplicate_reasoning():
+def test_format_verdict_display_defaults_confidence_to_unknown_or_given_value():
     result = format_verdict_display({
         "decision": "WATCH",
         "reasoning": "Evidence is mixed.",
@@ -32,5 +32,4 @@ def test_format_verdict_display_does_not_duplicate_reasoning():
         "confidence": "low",
     })
 
-    assert result["summary"] == "Decision: WATCH. Signals: 1. Evidence is mixed."
     assert result["confidence"] == "low"

@@ -1,6 +1,7 @@
 import os
 import json
 import time
+from datetime import date
 from anthropic import Anthropic
 from typing import Dict, Any
 import logging
@@ -75,7 +76,7 @@ def get_careers_page_data(company_name: str, careers_url: str = None) -> Dict[st
         query = (
             f'"{company_name}" jobs hiring "open positions" '
             f'OR "job openings" OR careers site:greenhouse.io OR site:lever.co '
-            f'OR site:linkedin.com/jobs 2024 2025'
+            f'OR site:linkedin.com/jobs {date.today().year - 1} {date.today().year}'
         )
         model = SONNET_MODEL
         started_at = time.perf_counter()
@@ -93,8 +94,10 @@ def get_careers_page_data(company_name: str, careers_url: str = None) -> Dict[st
             response=response,
         )
 
-        text = " ".join(block.text for block in response.content if getattr(block, "type", None) == "text")
-        careers_data["source_urls"] = list(dict.fromkeys(citation.url for block in response.content for citation in getattr(block, "citations", []) if getattr(citation, "url", None)))
+        text_blocks = [block for block in response.content if getattr(block, "type", None) == "text"]
+        cited_blocks = [block for block in text_blocks if getattr(block, "citations", None) or []]
+        text = " ".join(block.text for block in (cited_blocks or text_blocks))
+        careers_data["source_urls"] = list(dict.fromkeys(citation.url for block in text_blocks for citation in (getattr(block, "citations", None) or []) if getattr(citation, "url", None)))
 
         extracted = _extract_hiring_fields(company_name, text, client)
         careers_data.update(extracted)

@@ -2,7 +2,7 @@
 
 GTM Agent is a sales intelligence demo for founders, GTM engineers, and account executives. Enter what you sell and a target company; it searches public web evidence, compares the signals with an inferred ICP, and returns a `PURSUE`, `WATCH`, or `DEPRIORITIZE` recommendation with confidence, citations, and failed-source warnings.
 
-The deployed app is the primary product walkthrough; add a current result-screen capture here after the public demo URL is available.
+The app presents an evidence-backed verdict with source links and confidence, so the result screen is the primary product walkthrough.
 
 ## Architecture
 
@@ -49,6 +49,3 @@ pytest
 - Technology and hiring signals are web evidence, not direct BuiltWith or careers API data.
 - The demo uses one shared API key, so production deployments should add authentication, durable rate limiting, usage budgets, and secret management.
 
-## Live demo
-
-Deployment URL: add the public frontend URL here after publishing.

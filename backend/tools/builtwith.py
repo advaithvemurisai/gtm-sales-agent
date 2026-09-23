@@ -1,6 +1,7 @@
 import os
 import json
 import time
+from datetime import date
 from anthropic import Anthropic
 from typing import Dict, Any
 import logging
@@ -75,7 +76,7 @@ def get_builtwith_data(company_name: str) -> Dict[str, Any]:
         query = (
             f'"{company_name}" tech stack technologies '
             f'site:stackshare.io OR site:builtwith.com OR "built with" OR "powered by" '
-            f'OR engineering blog 2024 2025'
+            f'OR engineering blog {date.today().year - 1} {date.today().year}'
         )
         model = SONNET_MODEL
         started_at = time.perf_counter()
@@ -93,8 +94,10 @@ def get_builtwith_data(company_name: str) -> Dict[str, Any]:
             response=response,
         )
 
-        text = " ".join(block.text for block in response.content if getattr(block, "type", None) == "text")
-        builtwith_data["source_urls"] = list(dict.fromkeys(citation.url for block in response.content for citation in getattr(block, "citations", []) if getattr(citation, "url", None)))
+        text_blocks = [block for block in response.content if getattr(block, "type", None) == "text"]
+        cited_blocks = [block for block in text_blocks if getattr(block, "citations", None) or []]
+        text = " ".join(block.text for block in (cited_blocks or text_blocks))
+        builtwith_data["source_urls"] = list(dict.fromkeys(citation.url for block in text_blocks for citation in (getattr(block, "citations", None) or []) if getattr(citation, "url", None)))
 
         builtwith_data["technologies"] = _extract_tech_stack(company_name, text, client)
 

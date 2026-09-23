@@ -19,10 +19,10 @@ COMPANY SIGNALS (extracted from web search):
 
 EVIDENCE:
 
-TECH STACK (BuiltWith):
+TECHNOLOGY SIGNALS (web search):
 {builtwith_summary}
 
-HIRING SIGNALS (Careers):
+HIRING SIGNALS (web search):
 {careers_summary}
 
 COMPANY FUNDAMENTALS (Web Search):
@@ -34,8 +34,8 @@ RECENT NEWS (Web Search):
 EVALUATION INSTRUCTIONS:
 1. If target_company_size is specified, check headcount_range against it. Flag clearly if outside range.
 2. If funding_stage is specified, check company funding stage against it. A mismatch is a strong deprioritize signal.
-3. If tech_signals are specified, check BuiltWith summary for those tools. Presence = positive signal.
-4. If hiring_signals are specified, check careers summary for matching roles. Presence = urgency signal.
+3. If tech_signals are specified, check the technology summary for those tools. Presence = positive signal.
+4. If hiring_signals are specified, check the hiring summary for matching roles. Presence = urgency signal.
 5. If budget_indicator is specified, use revenue and funding to assess whether the company likely has budget.
 6. Weight web search signals most heavily when sources conflict.
 7. If data is missing or conflicting, say so explicitly rather than guessing.

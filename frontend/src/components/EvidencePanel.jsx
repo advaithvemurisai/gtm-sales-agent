@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
 import FormattedText from './FormattedText';
 
+const SOURCE_LABELS = { builtwith: 'Technology signals', careers: 'Hiring signals', web_search: 'Web search' };
+
+function sourceDomain(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+}
+
 const SIGNAL_LABELS = {
   funding_stage: 'Funding stage',
   total_funding: 'Total funding',
@@ -55,9 +65,9 @@ function EvidencePanel({ evidence }) {
       </div>
 
       <div style={{ display: 'grid', gap: 12 }}>
-        {Object.entries(evidence?.source_errors || {}).map(([source, error]) => (
+        {Object.entries(evidence?.source_errors || {}).map(([source]) => (
           <div key={source} role="alert" style={{ padding: '12px 14px', border: '1px solid rgba(210, 153, 34, 0.35)', background: 'rgba(210, 153, 34, 0.08)', borderRadius: 8, color: '#d29922', fontSize: 13 }}>
-            {source} evidence was unavailable. The verdict may be less reliable.
+            {SOURCE_LABELS[source] || source} was unavailable. The verdict may be less reliable.
           </div>
         ))}
         {SECTIONS.map(({ id, title, icon, type }) => {
@@ -90,7 +100,7 @@ function EvidencePanel({ evidence }) {
                   )}
                   {(evidence?.source_urls?.[id] || []).length > 0 && (
                     <div style={{ marginTop: 14, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                      {evidence.source_urls[id].map((url) => <a key={url} href={url} target="_blank" rel="noreferrer" style={{ color: '#58a6ff', fontSize: 12 }}>View source</a>)}
+                      {evidence.source_urls[id].map((url) => <a key={url} href={url} target="_blank" rel="noreferrer" style={{ color: '#58a6ff', fontSize: 12 }}>{sourceDomain(url)}</a>)}
                     </div>
                   )}
                 </div>

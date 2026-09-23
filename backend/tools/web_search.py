@@ -2,6 +2,7 @@ import os
 import json
 import logging
 import time
+from datetime import date
 from anthropic import Anthropic
 from typing import Dict, Any
 from backend.telemetry import log_anthropic_usage
@@ -28,8 +29,10 @@ def _run_search(query: str, client: Anthropic) -> tuple[str, list[str]]:
         started_at=started_at,
         response=response,
     )
-    text = " ".join(block.text for block in response.content if getattr(block, "type", None) == "text")
-    citations = [citation.url for block in response.content for citation in getattr(block, "citations", []) if getattr(citation, "url", None)]
+    text_blocks = [block for block in response.content if getattr(block, "type", None) == "text"]
+    cited_blocks = [block for block in text_blocks if getattr(block, "citations", None) or []]
+    text = " ".join(block.text for block in (cited_blocks or text_blocks))
+    citations = [citation.url for block in text_blocks for citation in (getattr(block, "citations", None) or []) if getattr(citation, "url", None)]
     return text, citations
 
 
@@ -103,7 +106,7 @@ def get_web_search_data(company_name: str) -> Dict[str, Any]:
         web_search_data["fundamentals"] = fundamentals_text
 
         news_query = (
-            f'"{company_name}" recent news 2024 2025 '
+            f'"{company_name}" recent news {date.today().year - 1} {date.today().year} '
             f'hiring growth product launch partnerships'
         )
         news_text, news_urls = _run_search(news_query, client)

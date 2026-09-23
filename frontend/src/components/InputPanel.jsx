@@ -32,7 +32,7 @@ function InputPanel({ onAnalyze }) {
             Evaluate a target company
           </h1>
           <p style={{ fontSize: 15, color: 'var(--color-text-secondary)', lineHeight: 1.8, margin: 0 }}>
-            Enter a company name and product description, then the agent will analyze signals from tech stack, hiring, and recent web activity.
+            Enter a company name and product description, then the agent will compare company, technology, hiring, and news signals against your ICP.
           </p>
         </div>
 
@@ -83,7 +83,7 @@ function InputPanel({ onAnalyze }) {
 
         <div style={{ marginTop: '1.75rem', border: '1px solid var(--color-border-secondary)', borderRadius: 'var(--border-radius-md)', background: 'rgba(255, 255, 255, 0.03)', padding: '1.35rem' }}>
           <p style={{ fontSize: 13, color: 'var(--color-text-tertiary)', lineHeight: 1.8, margin: 0 }}>
-            Returns <strong style={{ color: 'var(--color-text-secondary)', fontWeight: 600 }}>Pursue</strong>, <strong style={{ color: 'var(--color-text-secondary)', fontWeight: 600 }}>Watch</strong>, or <strong style={{ color: 'var(--color-text-secondary)', fontWeight: 600 }}>Deprioritize</strong> with company signals, tech stack, hiring data, and web search.
+            Returns <strong style={{ color: 'var(--color-text-secondary)', fontWeight: 600 }}>Pursue</strong>, <strong style={{ color: 'var(--color-text-secondary)', fontWeight: 600 }}>Watch</strong>, or <strong style={{ color: 'var(--color-text-secondary)', fontWeight: 600 }}>Deprioritize</strong> with company, technology, hiring, and news signals.
           </p>
         </div>
       </div>

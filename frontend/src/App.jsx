@@ -7,7 +7,7 @@ import './App.css';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 function App() {
-  const [phase, setPhase] = useState('input'); // input, chat, result
+  const [phase, setPhase] = useState('input');
   const [companyData, setCompanyData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
