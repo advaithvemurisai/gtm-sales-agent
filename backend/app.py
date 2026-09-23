@@ -4,7 +4,9 @@ import time
 from collections import deque
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from typing import Annotated
+
+from pydantic import BaseModel, ConfigDict, Field
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -37,13 +39,29 @@ app.add_middleware(
 )
 
 
+ShortText = Annotated[str, Field(max_length=80)]
+
+
+class IcpProfile(BaseModel):
+    """A seller-reviewed ICP; bounded so edited criteria can't bloat or hijack the verdict prompt."""
+    model_config = ConfigDict(extra="forbid")
+
+    target_company_size: ShortText | None = None
+    funding_stage: list[ShortText] = Field(default_factory=list, max_length=8)
+    tech_signals: list[ShortText] = Field(default_factory=list, max_length=10)
+    hiring_signals: list[ShortText] = Field(default_factory=list, max_length=10)
+    budget_indicator: ShortText | None = None
+
+
 class AnalyzeRequest(BaseModel):
     company_name: str = Field(min_length=1, max_length=MAX_COMPANY_NAME_LENGTH)
     product_description: str = Field(min_length=1, max_length=MAX_PRODUCT_DESCRIPTION_LENGTH)
+    icp_profile: IcpProfile | None = None
 
 
 class AnalyzeResponse(BaseModel):
     company_name: str
+    icp_profile: dict
     verdict: dict
     evidence: dict
     summary: dict
@@ -63,8 +81,11 @@ def analyze(request: AnalyzeRequest, http_request: Request) -> AnalyzeResponse:
         raise HTTPException(status_code=429, detail="Too many analysis requests. Please try again shortly.")
     logger.info("Analyze request received for company=%s", request.company_name)
     try:
-        # Infer all ICP fields from product description - nothing hardcoded
-        icp_profile = infer_icp_signals(request.product_description)
+        # Reuse an edited profile when the seller has reviewed the inference.
+        if request.icp_profile:
+            icp_profile = request.icp_profile.model_dump()
+        else:
+            icp_profile = infer_icp_signals(request.product_description)
         icp_profile["raw_description"] = request.product_description
 
         # Run evaluation pipeline
@@ -109,6 +130,7 @@ def analyze(request: AnalyzeRequest, http_request: Request) -> AnalyzeResponse:
 
         return AnalyzeResponse(
             company_name=request.company_name,
+            icp_profile=icp_profile,
             verdict=verdict,
             evidence=evidence,
             summary=summary,

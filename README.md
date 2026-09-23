@@ -1,31 +1,55 @@
 # GTM Agent
 
-GTM Agent is a sales intelligence demo for founders, GTM engineers, and account executives. Enter what you sell and a target company; it searches public web evidence, compares the signals with an inferred ICP, and returns a `PURSUE`, `WATCH`, or `DEPRIORITIZE` recommendation with confidence, citations, and failed-source warnings.
+**Should your sales team go after this account?** Enter what you sell and a target company. GTM Agent infers your ideal customer profile, researches the company on the public web, and returns a **Pursue / Watch / Deprioritize** verdict with a confidence level, the evidence behind it, and a recommended next step.
 
-## Architecture
+**Live demo:** [gtm-sales-agent.vercel.app](https://gtm-sales-agent.vercel.app)
+
+![A Deprioritize verdict for Vercel with high confidence, a recommended next step, key signals, and the ideal customer profile used](docs/result.png)
+
+## What a seller gets
+
+- **A verdict they can defend.** Every verdict cites the evidence that drove it: headcount, funding stage, the tools the company uses, the roles it is hiring for, and recent news, each with links to sources.
+- **A next step specific to the account.** Which role to contact and what to open with, what to verify first, or what would make the account worth revisiting.
+- **Visible, editable assumptions.** The ideal customer profile inferred from "what you sell" is shown with the result. If an assumption is wrong, edit it and rerun; the verdict is judged against your criteria, not a hidden guess.
+- **Honest uncertainty.** If a source can't be retrieved, the page says so and confidence drops. A missing source is never treated as negative evidence.
+- **Built for daily use.** It remembers what you sell, keeps your recent account reviews, and copies a summary for your CRM or Slack in one click.
+
+## How it works
 
 ```mermaid
 flowchart LR
 	UI[React frontend] --> API[FastAPI /analyze]
-	API --> ICP[Infer ICP]
+	API --> ICP[Infer ICP from what you sell<br/>or use the edited one]
 	API --> Sources[Parallel web searches]
 	Sources --> Tech[Technology signals]
 	Sources --> Hiring[Hiring signals]
 	Sources --> Company[Fundamentals and news]
-	ICP --> Verdict[Verdict model]
-	Tech --> Verdict
-	Hiring --> Verdict
-	Company --> Verdict
+	Tech --> Extract[Structured extraction<br/>and summaries]
+	Hiring --> Extract
+	Company --> Extract
+	ICP --> Verdict[Verdict, confidence,<br/>next step]
+	Extract --> Verdict
 	Verdict --> UI
 ```
 
-## Verdict rules
+1. **ICP inference.** Claude Haiku turns the product description into target company size, funding stages, technology signals, hiring signals, and budget tier.
+2. **Evidence gathering.** Four web searches run in parallel (technology, hiring, company fundamentals, recent news) using Claude Sonnet with the web search tool. Haiku extracts structured fields such as headcount, funding stage, and open roles.
+3. **Verdict.** Sonnet compares the evidence against each specified ICP criterion and returns a decision, reasoning, key signals, a confidence level, and a next step, which the backend parses into structured fields.
 
-The model evaluates only ICP fields that were inferred with a value. It compares headcount and funding stage, checks named technology and hiring signals, and uses revenue or funding as a budget proxy. Missing or failed sources must be called out and lower confidence; they are never treated as negative evidence.
+A typical analysis takes 30 to 60 seconds.
 
-## Local development
+## Engineering notes
 
-Set `ANTHROPIC_API_KEY` in `.env`, then run:
+- **Measured, not assumed.** The newer dynamic-filtering web search tool was benchmarked against the basic one on this app's queries. The basic tool answered in about 21s versus 34s to a timeout, used about 5x fewer input tokens, and returned fuller text, so the app uses it. In testing, the switch cut a full analysis from 130s to 37s.
+- **Bounded latency.** Each search is capped at three queries and 90 seconds with no retries. A search that fails or times out is reported as an unavailable source instead of failing the whole verdict.
+- **Validated input.** An edited ICP is a typed schema with per-field length and item limits, so user-supplied criteria can't bloat or hijack the verdict prompt.
+- **Robust parsing.** The verdict parser tolerates the formatting models actually produce (bold headings, `*` bullets, "Medium." or "[HIGH]" confidence) and rejects responses missing a decision or reasoning instead of silently defaulting.
+- **Abuse limits for a public demo.** Per-client sliding-window rate limiting, request size limits, and no internal error details in API responses.
+- **Tests.** The pytest suite covers tool responses without citations, paused search turns, failed sources, verdict parsing edge cases, ICP validation, and rate limiting.
+
+## Run locally
+
+Set `ANTHROPIC_API_KEY` in `.env`, then:
 
 ```bash
 pip install -r requirements.txt
@@ -33,25 +57,22 @@ uvicorn backend.app:app --reload --port 8000
 cd frontend && npm install && npm run dev
 ```
 
+Open http://localhost:3000. Run the tests with `pytest`.
+
 ## Deployment
 
-Run the backend behind your host's proxy with forwarded headers enabled, so the per-client rate limit sees real visitor IPs instead of the proxy's:
+The backend runs on Render and the frontend on Vercel. Start the backend with forwarded headers enabled so rate limiting sees real visitor IPs rather than the proxy's:
 
 ```bash
 uvicorn backend.app:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
 ```
 
-Set `ALLOWED_ORIGINS` to the exact frontend origin, and `VITE_API_BASE_URL` in the frontend deployment. `ANTHROPIC_SONNET_MODEL` and `ANTHROPIC_HAIKU_MODEL` override the default models (`claude-sonnet-5` and `claude-haiku-4-5`).
-
-## Tests
-
-```bash
-pytest
-```
+Set `ALLOWED_ORIGINS` on the backend to the exact frontend origin, and `VITE_API_BASE_URL` on the frontend to the backend URL. `ANTHROPIC_SONNET_MODEL` and `ANTHROPIC_HAIKU_MODEL` override the default models (`claude-sonnet-5` and `claude-haiku-4-5`).
 
 ## Known limitations
 
-- Search quality depends on Anthropic web-search availability and public company information. An analysis can take a minute or more; each web search is capped at three queries and 90 seconds, and a search that times out is reported as an unavailable source rather than failing the verdict.
-- Technology and hiring signals are web evidence, not direct BuiltWith or careers API data.
-- The demo uses one shared API key, so production deployments should add authentication, durable rate limiting, usage budgets, and secret management.
-
+- Evidence comes from public web search, so quality depends on what is published about a company. Technology and hiring signals are web evidence, not direct BuiltWith or applicant-tracking-system data.
+- Company names can be ambiguous; there is no disambiguation step yet.
+- One company per analysis; there is no bulk account list yet.
+- Recent reviews are stored in the browser only.
+- The demo uses one shared API key. A production deployment would add authentication, durable rate limiting, and usage budgets.

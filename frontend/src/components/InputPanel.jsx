@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 
-function InputPanel({ onAnalyze }) {
-  const [companyName, setCompanyName] = useState('');
-  const [productDescription, setProductDescription] = useState('');
+function InputPanel({ onAnalyze, companyName, setCompanyName, productDescription, setProductDescription, history, onSelectHistory }) {
   const [validationError, setValidationError] = useState('');
 
   const examples = [
-    { company_name: 'Ramp', product_description: 'B2B spend management and finance automation for growing companies.' },
-    { company_name: 'Vercel', product_description: 'Developer platform for deploying and scaling modern web applications.' },
-    { company_name: 'Rippling', product_description: 'Workforce management software for mid-market businesses.' },
+    { company_name: 'Vercel', pitch: 'Spend management', product_description: 'Spend management and corporate cards for fast-growing tech companies.' },
+    { company_name: 'Notion', pitch: 'SOC 2 automation', product_description: 'Security compliance automation (SOC 2, ISO 27001) for scaling SaaS companies.' },
+    { company_name: 'Gong', pitch: 'RevOps analytics', product_description: 'Data warehouse and analytics platform for revenue operations teams.' },
   ];
 
   const handleSubmit = (e) => {
@@ -75,11 +73,22 @@ function InputPanel({ onAnalyze }) {
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {examples.map((example) => (
               <button key={example.company_name} type="button" onClick={() => { setCompanyName(example.company_name); setProductDescription(example.product_description); setValidationError(''); }} style={{ border: '1px solid var(--color-border-secondary)', background: 'transparent', color: 'var(--color-text-secondary)', borderRadius: 6, padding: '8px 11px', cursor: 'pointer' }}>
-                {example.company_name}
+                Sell {example.pitch} to <strong style={{ color: 'var(--color-text-primary)' }}>{example.company_name}</strong>
               </button>
             ))}
           </div>
         </div>
+
+        {history?.length > 0 && (
+          <div className="history-panel">
+            <p className="eyebrow">Recent account reviews</p>
+            {history.slice(0, 5).map((item) => (
+              <button className="history-row" key={`${item.company_name}-${item.analyzed_at}`} type="button" onClick={() => onSelectHistory(item)}>
+                <span>{item.company_name}</span><strong>{item.decision}</strong>
+              </button>
+            ))}
+          </div>
+        )}
 
         <div style={{ marginTop: '1.75rem', border: '1px solid var(--color-border-secondary)', borderRadius: 'var(--border-radius-md)', background: 'rgba(255, 255, 255, 0.03)', padding: '1.35rem' }}>
           <p style={{ fontSize: 13, color: 'var(--color-text-tertiary)', lineHeight: 1.8, margin: 0 }}>

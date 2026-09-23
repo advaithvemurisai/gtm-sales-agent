@@ -16,6 +16,7 @@ def format_verdict_display(verdict: Dict[str, Any]) -> Dict[str, Any]:
         "signals": signals,
         "color": _get_verdict_color(decision),
         "confidence": _clean_text(verdict.get("confidence", "unknown")).lower() or "unknown",
+        "next_step": _clean_text(verdict.get("next_step")),
     }
 
 
@@ -38,3 +39,4 @@ def _get_verdict_color(decision: str) -> str:
         return "red"
     else:
         return "yellow"
+

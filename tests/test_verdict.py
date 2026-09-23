@@ -34,6 +34,20 @@ def test_format_verdict_display_defaults_confidence_to_unknown_or_given_value():
 
     assert result["confidence"] == "low"
 
+
+def test_parse_verdict_reads_company_specific_next_step():
+    result = _parse_verdict(
+        "VERDICT: PURSUE\nREASONING: Strong fit.\nKEY SIGNALS:\n- Hiring a RevOps lead\n"
+        "CONFIDENCE: HIGH\n**NEXT STEP:** Contact the VP Finance and open with\nthe new RevOps hire."
+    )
+
+    assert result["next_step"] == "Contact the VP Finance and open with the new RevOps hire."
+    assert format_verdict_display(result)["next_step"] == result["next_step"]
+
+
+def test_format_verdict_display_has_no_canned_next_step():
+    assert format_verdict_display({"decision": "PURSUE", "reasoning": "Strong fit."})["next_step"] == ""
+
 @pytest.mark.parametrize("line, expected", [
     ("CONFIDENCE:", "unknown"),
     ("CONFIDENCE: Medium.", "medium"),

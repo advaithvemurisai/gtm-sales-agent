@@ -6,7 +6,7 @@ from typing import Any
 
 from anthropic import Anthropic
 
-from backend.config import MAX_RETRIES, REQUEST_TIMEOUT_SECONDS, SONNET_MODEL, WEB_SEARCH_TOOL
+from backend.config import MAX_RETRIES, REQUEST_TIMEOUT_SECONDS, SEARCH_TIMEOUT_SECONDS, SONNET_MODEL, WEB_SEARCH_TOOL
 from backend.telemetry import log_anthropic_usage
 
 # Server-side web search can pause a long turn; resume it a bounded number of times.
@@ -44,7 +44,7 @@ def parse_json_object(text: str) -> dict:
 def run_web_search(client: Anthropic, query: str, logger: logging.Logger, operation: str) -> tuple[str, list[str]]:
     """Run a web search turn and return its text plus the cited source URLs."""
     # A timed-out search rarely succeeds on retry; fail fast and let the caller report the source as unavailable.
-    search_client = client.with_options(max_retries=0)
+    search_client = client.with_options(timeout=SEARCH_TIMEOUT_SECONDS, max_retries=0)
     messages = [{"role": "user", "content": query}]
     content = []
     for _ in range(_MAX_SEARCH_CONTINUATIONS + 1):

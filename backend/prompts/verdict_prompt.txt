@@ -39,6 +39,7 @@ EVALUATION INSTRUCTIONS:
 5. If budget_indicator is specified, use revenue and funding to assess whether the company likely has budget.
 6. Weight web search signals most heavily when sources conflict.
 7. If data is missing or conflicting, say so explicitly rather than guessing.
+8. The reader is a salesperson. Refer to criteria in plain words ("company size", "funding stage", "hiring roles"), never by field names like target_company_size or tech_signals.
 
 Respond in exactly this format:
 
@@ -52,3 +53,5 @@ KEY SIGNALS:
 - [Signal 3]
 
 CONFIDENCE: [LOW|MEDIUM|HIGH, based on evidence completeness and source agreement]
+
+NEXT STEP: [One concrete action for the seller specific to this company: which role to contact and which piece of evidence to open with for PURSUE, what to verify first for WATCH, or what change would make the account worth revisiting for DEPRIORITIZE]

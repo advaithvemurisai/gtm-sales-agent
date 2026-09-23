@@ -12,7 +12,7 @@ from backend.llm import get_client, load_prompt, response_text
 
 logger = logging.getLogger("gtm_agent.pipeline")
 
-_SECTION_NAMES = ("VERDICT", "DECISION", "REASONING", "WHY", "KEY SIGNALS", "SIGNALS", "KEY TAKEAWAYS", "CONFIDENCE")
+_SECTION_NAMES = ("VERDICT", "DECISION", "REASONING", "WHY", "KEY SIGNALS", "SIGNALS", "KEY TAKEAWAYS", "CONFIDENCE", "NEXT STEP")
 _SECTION_PATTERN = re.compile(
     r"^[*_`#\s]*(" + "|".join(_SECTION_NAMES) + r")[*_`]*\s*:[*_`]*\s*(.*)$",
     re.I,
@@ -209,6 +209,7 @@ def _parse_verdict(verdict_text: str) -> dict:
         "reasoning": "",
         "signals": [],
         "confidence": "unknown",
+        "next_step": "",
     }
 
     lines = [line.strip() for line in verdict_text.splitlines() if line.strip()]
@@ -242,6 +243,14 @@ def _parse_verdict(verdict_text: str) -> dict:
                 signal = re.sub(r"\s+", " ", signal).strip()
                 if signal:
                     verdict["signals"].append(signal)
+
+        elif section == "NEXT STEP":
+            step_lines = [rest]
+            for next_line in lines[i + 1:]:
+                if _section_heading(next_line):
+                    break
+                step_lines.append(next_line)
+            verdict["next_step"] = re.sub(r"\s+", " ", " ".join(step_lines)).strip()
 
         elif section == "CONFIDENCE":
             match = re.search(r"\b(low|medium|high)\b", rest, re.I)

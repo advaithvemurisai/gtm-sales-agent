@@ -4,13 +4,13 @@
   --color-background-success: rgba(34, 197, 94, 0.08);
   --color-text-primary: #e6edf3;
   --color-text-secondary: #8b949e;
-  --color-text-tertiary: #484f58;
+  --color-text-tertiary: #8b949e;
   --color-text-success: #3fb950;
   --color-border-primary: #30363d;
   --color-border-secondary: #21262d;
   --color-border-tertiary: #1c2128;
   --color-border-success: rgba(63, 185, 80, 0.3);
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+  --font-sans: 'Avenir Next', Avenir, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --border-radius-md: 8px;
 }
 
@@ -21,9 +21,7 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

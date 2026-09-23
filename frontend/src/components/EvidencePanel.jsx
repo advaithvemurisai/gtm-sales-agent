@@ -67,7 +67,7 @@ function EvidencePanel({ evidence }) {
       <div style={{ display: 'grid', gap: 12 }}>
         {Object.entries(evidence?.source_errors || {}).map(([source]) => (
           <div key={source} role="alert" style={{ padding: '12px 14px', border: '1px solid rgba(210, 153, 34, 0.35)', background: 'rgba(210, 153, 34, 0.08)', borderRadius: 8, color: '#d29922', fontSize: 13 }}>
-            {SOURCE_LABELS[source] || source} was unavailable. The verdict may be less reliable.
+            {SOURCE_LABELS[source] || source}: couldn't be retrieved, so the verdict is based on the other sources.
           </div>
         ))}
         {SECTIONS.map(({ id, title, icon, type }) => {

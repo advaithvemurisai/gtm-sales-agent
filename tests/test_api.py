@@ -1,3 +1,4 @@
+import pytest
 from fastapi.testclient import TestClient
 
 from backend.app import app
@@ -58,3 +59,53 @@ def test_rate_limit_is_per_client_and_forgets_idle_clients(monkeypatch):
     later = app_module._RATE_WINDOW_SECONDS + 5.0
     assert app_module._allow_request("10.0.0.3", later)
     assert set(app_module._request_windows) == {"10.0.0.3"}
+
+
+def _stub_pipeline(monkeypatch, seen):
+    def run(**kwargs):
+        seen.update(kwargs)
+        return {
+            "web_search": {"raw_data": {"company_signals": {}}, "summary": ""},
+            "technology": {"raw_data": {}, "summary": ""},
+            "hiring": {"raw_data": {}, "summary": ""},
+            "verdict": {"decision": "WATCH", "reasoning": "Limited evidence.", "signals": []},
+        }
+
+    monkeypatch.setattr("backend.app._request_windows", {})
+    monkeypatch.setattr("backend.app.run_evaluation_pipeline", run)
+
+
+def test_analyze_uses_reviewed_icp_instead_of_inferring(monkeypatch):
+    seen = {}
+    _stub_pipeline(monkeypatch, seen)
+    monkeypatch.setattr("backend.app.infer_icp_signals", lambda description: pytest.fail("should not infer"))
+
+    response = TestClient(app).post("/analyze", json={
+        "company_name": "Example",
+        "product_description": "B2B analytics",
+        "icp_profile": {"funding_stage": ["Series A"], "tech_signals": ["Salesforce", "HubSpot"]},
+    })
+
+    assert response.status_code == 200
+    assert seen["icp_profile"]["tech_signals"] == ["Salesforce", "HubSpot"]
+    assert response.json()["icp_profile"]["raw_description"] == "B2B analytics"
+
+
+@pytest.mark.parametrize("icp_profile", [
+    {"funding_stage": "Series A"},
+    {"tech_signals": ["x" * 81]},
+    {"hiring_signals": ["Role"] * 11},
+    {"unexpected": "field"},
+])
+def test_analyze_rejects_malformed_icp(monkeypatch, icp_profile):
+    seen = {}
+    _stub_pipeline(monkeypatch, seen)
+
+    response = TestClient(app).post("/analyze", json={
+        "company_name": "Example",
+        "product_description": "B2B analytics",
+        "icp_profile": icp_profile,
+    })
+
+    assert response.status_code == 422
+    assert not seen
