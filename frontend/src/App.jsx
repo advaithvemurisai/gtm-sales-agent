@@ -91,6 +91,7 @@ function validateProfile(profile) {
 
 function App() {
   const healthStarted = useRef(false);
+  const landingScroll = useRef(0);
   const [phase, setPhase] = useState('input');
   const [companyData, setCompanyData] = useState(null);
   const [companyName, setCompanyName] = useState(() => storage.get(COMPANY_KEY, ''));
@@ -114,6 +115,7 @@ function App() {
     analyzed_at: new Date(example.analyzed_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }),
   }));
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [pendingSection, setPendingSection] = useState(null);
 
   useEffect(() => { storage.set(PRODUCT_KEY, productDescription); }, [productDescription]);
   useEffect(() => { storage.set(COMPANY_KEY, companyName); }, [companyName]);
@@ -134,6 +136,35 @@ function App() {
     return () => clearInterval(timer);
   }, [loading]);
 
+  // Each result is its own browser history entry, so Back returns to the landing page
+  // and Forward reopens the result.
+  useEffect(() => {
+    // The app switches views itself, so it also owns scroll position (see the effect below).
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+    const onPopState = (event) => {
+      setIcpDraft(null);
+      setError(null);
+      setPhase(event.state?.view === 'result' ? 'result' : 'input');
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  // Results open at the top; the landing page returns to where the user left it,
+  // or to the section a header link asked for.
+  useEffect(() => {
+    if (phase === 'result') {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      return;
+    }
+    if (phase !== 'input') return;
+    if (pendingSection === 'top') window.scrollTo({ top: 0, behavior: 'instant' });
+    else if (pendingSection) document.getElementById(pendingSection)?.scrollIntoView({ behavior: 'instant' });
+    else window.scrollTo({ top: landingScroll.current, behavior: 'instant' });
+    landingScroll.current = window.scrollY;
+    setPendingSection(null);
+  }, [phase, pendingSection, companyData]);
+
   useEffect(() => {
     if (!copyStatus) return undefined;
     const timer = setTimeout(() => setCopyStatus(''), 2500);
@@ -141,11 +172,15 @@ function App() {
   }, [copyStatus]);
 
   const showResult = (result) => {
+    if (phase === 'input') landingScroll.current = window.scrollY;
     setCompanyData(result);
     setIcpDraft(null);
     setIcpError(null);
     setCopyStatus('');
     setPhase('result');
+    const entry = { view: 'result' };
+    if (window.history.state?.view === 'result') window.history.replaceState(entry, '', window.location.pathname);
+    else window.history.pushState(entry, '', window.location.pathname);
   };
 
   const handleAnalyze = async (data, icpProfile = null) => {
@@ -185,11 +220,23 @@ function App() {
     }
   };
 
-  const handleStartOver = () => {
+  const goToLanding = (section = 'top') => {
+    setPendingSection(section);
+    if (phase === 'result' && window.history.state?.view === 'result') {
+      window.history.back();
+      return;
+    }
     setPhase('input');
-    setCompanyData(null);
     setIcpDraft(null);
     setError(null);
+  };
+
+  const handleStartOver = () => goToLanding('top');
+
+  const navigate = (section) => (event) => {
+    if (phase === 'input' && section !== 'top') return;
+    event.preventDefault();
+    goToLanding(section);
   };
 
   const handleCopy = async () => {
@@ -225,7 +272,10 @@ function App() {
 
   return (
     <div className="app-shell">
-      <header className="app-header"><strong>GTM Agent</strong><nav><a href="#how-it-works">How it works</a><a href="#example">Example</a></nav></header>
+      <header className="app-header">
+        <a className="brand" href="/" onClick={navigate('top')}>GTM Agent</a>
+        <nav><a href="#how-it-works" onClick={navigate('how-it-works')}>How it works</a><a href="#example" onClick={navigate('example')}>Example</a></nav>
+      </header>
       {error && (
         <div className={`notice ${error.code === 'demo_paused' ? 'notice-paused' : 'notice-error'}`} role="alert">
           <span>{error.code === 'demo_paused' ? 'Live research is paused right now. ' : error.message}</span>

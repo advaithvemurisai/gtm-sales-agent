@@ -55,7 +55,7 @@ button, input, textarea { font: inherit; }
 button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
 .app-shell { min-height: 100vh; background: var(--color-background-primary); color: var(--color-text-primary); }
 .app-header { max-width: 1120px; margin: 0 auto; padding: 1.5rem 1.5rem 1rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-.app-header strong { color: var(--color-text-primary); font-size: 18px; letter-spacing: -0.02em; }
+.app-header .brand { color: var(--color-text-primary); font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
 .app-header nav { display: flex; gap: 1.5rem; }
 .app-header a { color: var(--color-text-secondary); font-size: 13px; text-decoration: none; }
 .app-header a:hover { color: var(--color-accent); }
