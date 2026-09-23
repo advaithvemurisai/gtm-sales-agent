@@ -23,6 +23,7 @@ _BULLET_PATTERN = re.compile(r"^[-•*]\s+")
 def run_evaluation_pipeline(
     company_name: str,
     icp_profile: dict = None,
+    company_website: str | None = None,
 ) -> dict:
     """
     Run the evaluation pipeline with independent evidence sources in parallel.
@@ -38,9 +39,14 @@ def run_evaluation_pipeline(
     system_prompt = load_prompt("evaluation_system_prompt.txt")
 
     with ThreadPoolExecutor(max_workers=3) as executor:
-        technology_future = executor.submit(get_tech_signals, company_name)
-        hiring_future = executor.submit(get_hiring_signals, company_name)
-        web_search_future = executor.submit(get_web_search_data, company_name)
+        if company_website:
+            technology_future = executor.submit(get_tech_signals, company_name, company_website)
+            hiring_future = executor.submit(get_hiring_signals, company_name, company_website)
+            web_search_future = executor.submit(get_web_search_data, company_name, company_website)
+        else:
+            technology_future = executor.submit(get_tech_signals, company_name)
+            hiring_future = executor.submit(get_hiring_signals, company_name)
+            web_search_future = executor.submit(get_web_search_data, company_name)
         technology_result = technology_future.result()
         hiring_result = hiring_future.result()
         web_search_result = web_search_future.result()

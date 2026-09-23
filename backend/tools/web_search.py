@@ -62,7 +62,7 @@ Text:
         }
 
 
-def get_web_search_data(company_name: str) -> Dict[str, Any]:
+def get_web_search_data(company_name: str, company_website: str | None = None) -> Dict[str, Any]:
     client = get_client()
 
     web_search_data = {
@@ -75,13 +75,14 @@ def get_web_search_data(company_name: str) -> Dict[str, Any]:
     }
 
     try:
+        identity = f" ({company_website})" if company_website else ""
         fundamentals_query = (
-            f"Find {company_name}'s funding stage, total funding, employee headcount, founding year, "
+            f"Find {company_name}{identity}'s funding stage, total funding, employee headcount, founding year, "
             f"headquarters, and revenue estimate."
         )
         year = date.today().year
         news_query = (
-            f"Find {company_name}'s most significant news from {year - 1}-{year}: funding, hiring, "
+            f"Find {company_name}{identity}'s most significant news from {year - 1}-{year}: funding, hiring, "
             f"growth, product launches, and partnerships."
         )
         with ThreadPoolExecutor(max_workers=2) as executor:

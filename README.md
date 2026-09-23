@@ -14,6 +14,12 @@
 - **Honest uncertainty.** If a source can't be retrieved, the page says so and confidence drops. A missing source is never treated as negative evidence.
 - **Built for daily use.** It remembers what you sell, keeps your recent account reviews, and copies a summary for your CRM or Slack in one click.
 
+The landing page is written for founders, SDRs, AEs, and RevOps: enter what you sell, the account, and optionally its website. It explains the workflow, shows the evidence-first result format, and keeps recent reviews in the browser. Company websites help disambiguate accounts with similar names.
+
+Saved landing-page examples live in `frontend/src/examples/` when they have been recorded. To create or refresh them, set `ANTHROPIC_API_KEY` and run `python scripts/record_examples.py`. This calls the live Anthropic pipeline and incurs API charges, so it is intentionally not part of the normal test or build steps. Until examples are recorded, the landing page shows the real result screenshot from `docs/result.png`.
+
+If the shared demo account has no Anthropic credits, live research returns a calm paused state with a link to the saved example instead of a generic server error. Network failures explain that the server may be waking and offer a retry.
+
 ## How it works
 
 ```mermaid

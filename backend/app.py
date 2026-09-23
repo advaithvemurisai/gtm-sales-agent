@@ -4,6 +4,7 @@ import time
 from collections import deque
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -11,6 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from backend.config import MAX_COMPANY_NAME_LENGTH, MAX_PRODUCT_DESCRIPTION_LENGTH
+from backend.errors import is_billing_error
 from backend.agent.icp import infer_icp_signals
 from backend.agent.pipeline import run_evaluation_pipeline
 from backend.agent.verdict import format_verdict_display
@@ -56,6 +58,7 @@ class IcpProfile(BaseModel):
 class AnalyzeRequest(BaseModel):
     company_name: str = Field(min_length=1, max_length=MAX_COMPANY_NAME_LENGTH)
     product_description: str = Field(min_length=1, max_length=MAX_PRODUCT_DESCRIPTION_LENGTH)
+    company_website: str | None = Field(default=None, max_length=200)
     icp_profile: IcpProfile | None = None
 
 
@@ -91,7 +94,8 @@ def analyze(request: AnalyzeRequest, http_request: Request) -> AnalyzeResponse:
         # Run evaluation pipeline
         result = run_evaluation_pipeline(
             company_name=request.company_name,
-            icp_profile=icp_profile
+            icp_profile=icp_profile,
+            company_website=request.company_website,
         )
 
         # Format response
@@ -142,6 +146,11 @@ def analyze(request: AnalyzeRequest, http_request: Request) -> AnalyzeResponse:
             request.company_name,
             (time.perf_counter() - started_at) * 1000,
         )
+        if is_billing_error(e):
+            return JSONResponse(
+                status_code=503,
+                content={"detail": "Live research is paused right now.", "code": "demo_paused"},
+            )
         raise HTTPException(status_code=500, detail="Analysis failed. Check the server logs for details.")
 
 

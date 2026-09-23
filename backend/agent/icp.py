@@ -3,6 +3,7 @@ import time
 from backend.telemetry import log_anthropic_usage
 from backend.config import HAIKU_MODEL
 from backend.llm import get_client, parse_json_object, response_text
+from backend.errors import is_billing_error
 
 logger = logging.getLogger("gtm_agent.icp")
 
@@ -51,8 +52,10 @@ Rules:
             response=response,
         )
         return parse_json_object(response_text(response))
-    except Exception:
+    except Exception as error:
         logger.exception("ICP inference failed")
+        if is_billing_error(error):
+            raise
         return {
             "target_company_size": None,
             "funding_stage": [],

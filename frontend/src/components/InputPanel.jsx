@@ -1,102 +1,70 @@
 import React, { useState } from 'react';
 
-function InputPanel({ onAnalyze, companyName, setCompanyName, productDescription, setProductDescription, history, onSelectHistory }) {
+function InputPanel({ onAnalyze, companyName, setCompanyName, productDescription, setProductDescription, companyWebsite, setCompanyWebsite, history, onSelectHistory, examples, onSelectExample }) {
   const [validationError, setValidationError] = useState('');
 
-  const examples = [
-    { company_name: 'Vercel', pitch: 'Spend management', product_description: 'Spend management and corporate cards for fast-growing tech companies.' },
-    { company_name: 'Notion', pitch: 'SOC 2 automation', product_description: 'Security compliance automation (SOC 2, ISO 27001) for scaling SaaS companies.' },
-    { company_name: 'Gong', pitch: 'RevOps analytics', product_description: 'Data warehouse and analytics platform for revenue operations teams.' },
-  ];
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
     if (!companyName.trim() || !productDescription.trim()) {
-      setValidationError('Add a company and a short description of what you sell.');
+      setValidationError('Add an account and a short description of what you sell.');
       return;
     }
     setValidationError('');
-    onAnalyze({ company_name: companyName, product_description: productDescription });
+    onAnalyze({ company_name: companyName.trim(), product_description: productDescription.trim(), company_website: companyWebsite.trim() || undefined });
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--color-background-primary)', padding: '2rem 1rem', color: 'var(--color-text-primary)' }}>
-      <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <div style={{ border: '1px solid var(--color-border-secondary)', borderRadius: 'var(--border-radius-md)', background: 'var(--color-background-secondary)', padding: '2rem', marginBottom: '2rem' }}>
-          <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-secondary)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>
-            Sales targeting assistant
-          </p>
-          <h1 style={{ fontSize: 30, fontWeight: 700, color: 'var(--color-text-primary)', margin: 0, lineHeight: 1.05, marginBottom: 12 }}>
-            Evaluate a target company
-          </h1>
-          <p style={{ fontSize: 15, color: 'var(--color-text-secondary)', lineHeight: 1.8, margin: 0 }}>
-            Enter a company name and product description, then the agent will compare company, technology, hiring, and news signals against your ICP.
-          </p>
+    <main className="landing-page">
+      <section className="hero-section" aria-labelledby="hero-title">
+        <div className="hero-copy">
+          <p className="hero-kicker">Account research for focused sales teams</p>
+          <h1 id="hero-title">Know which accounts are worth your team&apos;s time.</h1>
+          <p className="hero-lede">Research a target account in about a minute, covering fit against who you sell to, why now, and who to contact, with every claim sourced.</p>
+          <div className="trust-points" aria-label="Product benefits">
+            <span><i className="ti ti-check" />Sourced evidence</span>
+            <span><i className="ti ti-adjustments" />Your criteria, editable</span>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem' }}>
-          <label htmlFor="company" style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>
-            Company name
-            <input
-              id="company"
-              type="text"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              placeholder="e.g. Notion, Rippling, Brex"
-              style={{ width: '100%', marginTop: 8, border: '1px solid var(--color-border-secondary)', borderRadius: 'var(--border-radius-md)', padding: '12px', fontSize: 15, background: 'var(--color-background-primary)', color: 'var(--color-text-primary)', fontFamily: 'var(--font-sans)', outline: 'none' }}
-            />
+        <form className="research-form" onSubmit={handleSubmit} noValidate>
+          <div className="form-heading"><p className="eyebrow">Start a review</p><h2>Research an account</h2><p>Tell us what you sell and who you are considering.</p></div>
+          <label htmlFor="product">Your product
+            <textarea id="product" rows={4} value={productDescription} onChange={(event) => setProductDescription(event.target.value)} placeholder="e.g. Spend management for fast-growing technology companies" />
           </label>
-
-          <label htmlFor="product" style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>
-            What you sell
-            <textarea
-              id="product"
-              rows={3}
-              value={productDescription}
-              onChange={(e) => setProductDescription(e.target.value)}
-              placeholder="e.g. Data analytics platform for B2B SaaS companies"
-              style={{ width: '100%', marginTop: 8, border: '1px solid var(--color-border-secondary)', borderRadius: 'var(--border-radius-md)', padding: '12px', fontSize: 15, background: 'var(--color-background-primary)', color: 'var(--color-text-primary)', fontFamily: 'var(--font-sans)', outline: 'none', resize: 'vertical', lineHeight: 1.6 }}
-            />
+          <label htmlFor="company">Account to research
+            <input id="company" type="text" value={companyName} onChange={(event) => setCompanyName(event.target.value)} placeholder="e.g. Notion, Rippling, Brex" />
           </label>
-
-          <button
-            type="submit"
-            style={{ width: '100%', padding: 14, borderRadius: 'var(--border-radius-md)', border: 'none', background: 'var(--color-text-success)', color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer', transition: 'opacity 0.15s ease' }}
-          >
-            Analyze company
-          </button>
-          {validationError && <p role="alert" style={{ color: '#f85149', fontSize: 13, margin: 0 }}>{validationError}</p>}
+          <label htmlFor="website">Company website <span>(optional)</span>
+            <input id="website" type="url" maxLength={200} value={companyWebsite} onChange={(event) => setCompanyWebsite(event.target.value)} placeholder="e.g. notion.so" />
+          </label>
+          {validationError && <p role="alert" className="form-error">{validationError}</p>}
+          <button className="primary-button research-button" type="submit">Research account <i className="ti ti-arrow-right" /></button>
+          <p className="form-note">You&apos;ll get a clear verdict, the reasoning behind it, and the evidence to share with your team.</p>
         </form>
+      </section>
 
-        <div style={{ marginTop: '1.5rem' }}>
-          <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 10 }}>Try an example</p>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {examples.map((example) => (
-              <button key={example.company_name} type="button" onClick={() => { setCompanyName(example.company_name); setProductDescription(example.product_description); setValidationError(''); }} style={{ border: '1px solid var(--color-border-secondary)', background: 'transparent', color: 'var(--color-text-secondary)', borderRadius: 6, padding: '8px 11px', cursor: 'pointer' }}>
-                Sell {example.pitch} to <strong style={{ color: 'var(--color-text-primary)' }}>{example.company_name}</strong>
-              </button>
-            ))}
-          </div>
+      <section className="landing-section example-section" id="example" aria-labelledby="example-title">
+        <div className="section-intro"><p className="eyebrow">See a real result</p><h2 id="example-title">A useful answer, not another list of accounts.</h2></div>
+        {examples.length > 0 ? <div className="example-tabs" role="tablist" aria-label="Saved examples">{examples.map((example) => <button key={example.id} type="button" onClick={() => onSelectExample(example)}>{example.label}<small>Saved example · analyzed {example.analyzed_at}</small></button>)}</div> : <figure className="example-image"><img src="/result.png" alt="Example account research result" /><figcaption>Example result</figcaption></figure>}
+      </section>
+
+      <section className="landing-section how-section" id="how-it-works" aria-labelledby="how-title">
+        <div className="section-intro"><p className="eyebrow">How it works</p><h2 id="how-title">From a hunch to a defensible next step.</h2></div>
+        <div className="steps-grid">
+          <article><span>01</span><h3>Describe what you sell</h3><p>Share your product in plain language. We turn it into clear, editable buying criteria.</p></article>
+          <article><span>02</span><h3>We research the company</h3><p>We search the public web for company facts, technology, hiring, and recent news.</p></article>
+          <article><span>03</span><h3>Get a verdict you can defend</h3><p>See whether to pursue, watch, or deprioritize the account, with sources and a next step.</p></article>
         </div>
+      </section>
 
-        {history?.length > 0 && (
-          <div className="history-panel">
-            <p className="eyebrow">Recent account reviews</p>
-            {history.slice(0, 5).map((item) => (
-              <button className="history-row" key={`${item.company_name}-${item.analyzed_at}`} type="button" onClick={() => onSelectHistory(item)}>
-                <span>{item.company_name}</span><strong>{item.decision}</strong>
-              </button>
-            ))}
-          </div>
-        )}
+      <section className="landing-section audience-section" aria-labelledby="audience-title">
+        <div><p className="eyebrow">Who it&apos;s for</p><h2 id="audience-title">More signal for every person doing the work.</h2></div>
+        <div className="audience-list"><span>Founders doing their own sales</span><span>SDRs building focused lists</span><span>AEs planning the first call</span><span>RevOps setting a shared standard</span></div>
+        <p className="time-saved">Replaces an <strong>estimated 20–30 minutes</strong> of manual research per account.</p>
+      </section>
 
-        <div style={{ marginTop: '1.75rem', border: '1px solid var(--color-border-secondary)', borderRadius: 'var(--border-radius-md)', background: 'rgba(255, 255, 255, 0.03)', padding: '1.35rem' }}>
-          <p style={{ fontSize: 13, color: 'var(--color-text-tertiary)', lineHeight: 1.8, margin: 0 }}>
-            Returns <strong style={{ color: 'var(--color-text-secondary)', fontWeight: 600 }}>Pursue</strong>, <strong style={{ color: 'var(--color-text-secondary)', fontWeight: 600 }}>Watch</strong>, or <strong style={{ color: 'var(--color-text-secondary)', fontWeight: 600 }}>Deprioritize</strong> with company, technology, hiring, and news signals.
-          </p>
-        </div>
-      </div>
-    </div>
+      {history?.length > 0 && <section className="history-panel" aria-labelledby="history-title"><p className="eyebrow">Recent account reviews</p><h2 id="history-title">Pick up where you left off</h2>{history.slice(0, 5).map((item) => <button className="history-row" key={`${item.company_name}-${item.analyzed_at}`} type="button" onClick={() => onSelectHistory(item)}><span>{item.company_name}</span><strong>{item.decision}</strong></button>)}</section>}
+    </main>
   );
 }
 

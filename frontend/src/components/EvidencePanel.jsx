@@ -33,7 +33,7 @@ function SignalGrid({ signals }) {
   return (
     <div style={{ display: 'grid', gap: 10 }}>
       {rows.map(({ label, value }) => (
-        <div key={label} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '0.9rem 1rem', borderRadius: 8, background: 'rgba(255, 255, 255, 0.02)' }}>
+        <div key={label} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '0.9rem 1rem', borderRadius: 8, background: 'var(--color-background-tertiary)' }}>
           <span style={{ fontSize: 12, color: 'var(--color-text-tertiary)' }}>{label}</span>
           <span style={{ fontSize: 13, color: 'var(--color-text-primary)', fontWeight: 500, textAlign: 'right' }}>{value}</span>
         </div>
@@ -66,7 +66,7 @@ function EvidencePanel({ evidence }) {
 
       <div style={{ display: 'grid', gap: 12 }}>
         {Object.entries(evidence?.source_errors || {}).map(([source]) => (
-          <div key={source} role="alert" style={{ padding: '12px 14px', border: '1px solid rgba(210, 153, 34, 0.35)', background: 'rgba(210, 153, 34, 0.08)', borderRadius: 8, color: '#d29922', fontSize: 13 }}>
+          <div key={source} role="alert" style={{ padding: '12px 14px', border: '1px solid var(--color-text-warning)', background: 'var(--color-background-tertiary)', borderRadius: 8, color: 'var(--color-text-warning)', fontSize: 13 }}>
             {SOURCE_LABELS[source] || source}: couldn't be retrieved, so the verdict is based on the other sources.
           </div>
         ))}
@@ -81,7 +81,7 @@ function EvidencePanel({ evidence }) {
                 style={{ width: '100%', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(255, 255, 255, 0.04)', display: 'grid', placeItems: 'center' }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--color-background-tertiary)', display: 'grid', placeItems: 'center' }}>
                     <i className={`ti ${icon}`} style={{ fontSize: 12, color: 'var(--color-text-secondary)' }} />
                   </div>
                   <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-primary)' }}>{title}</span>
@@ -90,7 +90,7 @@ function EvidencePanel({ evidence }) {
               </button>
 
               {isOpen && (
-                <div style={{ padding: '1rem 1rem 1.1rem', background: 'rgba(255, 255, 255, 0.02)' }}>
+                <div style={{ padding: '1rem 1rem 1.1rem', background: 'var(--color-background-tertiary)' }}>
                   {!hasData ? (
                     <p style={{ fontSize: 13, color: 'var(--color-text-tertiary)', margin: 0 }}>No data available.</p>
                   ) : type === 'structured' ? (
@@ -100,7 +100,7 @@ function EvidencePanel({ evidence }) {
                   )}
                   {(evidence?.source_urls?.[id] || []).length > 0 && (
                     <div style={{ marginTop: 14, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                      {evidence.source_urls[id].map((url) => <a key={url} href={url} target="_blank" rel="noreferrer" style={{ color: '#58a6ff', fontSize: 12 }}>{sourceDomain(url)}</a>)}
+                      {evidence.source_urls[id].map((url) => <a key={url} href={url} target="_blank" rel="noreferrer" style={{ color: 'var(--color-accent)', fontSize: 12 }}>{sourceDomain(url)}</a>)}
                     </div>
                   )}
                 </div>

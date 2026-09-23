@@ -3,28 +3,28 @@ import FormattedText, { InlineFormattedText } from './FormattedText';
 
 const DECISION_STYLES = {
   PURSUE: {
-    border: 'rgba(63, 185, 80, 0.25)',
-    badgeBg: 'rgba(34, 197, 94, 0.14)',
-    badgeBorder: 'rgba(63, 185, 80, 0.25)',
-    badgeColor: '#3fb950',
+    border: 'var(--color-border-success)',
+    badgeBg: 'var(--color-background-success)',
+    badgeBorder: 'var(--color-border-success)',
+    badgeColor: 'var(--color-text-success)',
     icon: 'ti-circle-check',
-    iconColor: '#3fb950',
+    iconColor: 'var(--color-text-success)',
   },
   DEPRIORITIZE: {
-    border: 'rgba(248, 81, 73, 0.25)',
-    badgeBg: 'rgba(248, 81, 73, 0.12)',
-    badgeBorder: 'rgba(248, 81, 73, 0.25)',
-    badgeColor: '#f85149',
+    border: 'var(--color-text-danger)',
+    badgeBg: 'var(--color-background-tertiary)',
+    badgeBorder: 'var(--color-text-danger)',
+    badgeColor: 'var(--color-text-danger)',
     icon: 'ti-circle-x',
-    iconColor: '#f85149',
+    iconColor: 'var(--color-text-danger)',
   },
   WATCH: {
-    border: 'rgba(210, 153, 34, 0.25)',
-    badgeBg: 'rgba(210, 153, 34, 0.12)',
-    badgeBorder: 'rgba(210, 153, 34, 0.25)',
-    badgeColor: '#d29922',
+    border: 'var(--color-text-warning)',
+    badgeBg: 'var(--color-background-tertiary)',
+    badgeBorder: 'var(--color-text-warning)',
+    badgeColor: 'var(--color-text-warning)',
     icon: 'ti-eye',
-    iconColor: '#d29922',
+    iconColor: 'var(--color-text-warning)',
   },
 };
 
@@ -53,7 +53,7 @@ function VerdictCard({ verdict, company }) {
       </div>
 
       {verdict?.reasoning && (
-        <div style={{ padding: '1.1rem 1.1rem 0.9rem', borderRadius: 'var(--border-radius-md)', background: 'rgba(255, 255, 255, 0.02)', marginBottom: '1.25rem' }}>
+          <div style={{ padding: '1.1rem 1.1rem 0.9rem', borderRadius: 'var(--border-radius-md)', background: 'var(--color-background-tertiary)', marginBottom: '1.25rem' }}>
           <FormattedText text={verdict.reasoning} accentColor={styles.iconColor} />
         </div>
       )}

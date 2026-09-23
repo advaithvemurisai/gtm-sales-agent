@@ -60,7 +60,7 @@ Text:
         return dict(_EMPTY_STACK)
 
 
-def get_tech_signals(company_name: str) -> Dict[str, Any]:
+def get_tech_signals(company_name: str, company_website: str | None = None) -> Dict[str, Any]:
     """
     Find technology signals for a company via web search of engineering blogs,
     job posts, and public stack profiles.
@@ -76,8 +76,9 @@ def get_tech_signals(company_name: str) -> Dict[str, Any]:
 
     try:
         year = date.today().year
+        identity = f" ({company_website})" if company_website else ""
         query = (
-            f"Find which technologies {company_name} uses: languages, frameworks, cloud and data "
+            f"Find which technologies {company_name}{identity} uses: languages, frameworks, cloud and data "
             f"infrastructure, analytics, and CRM or sales tools. Check its engineering blog, job "
             f"postings, StackShare, or BuiltWith from {year - 1}-{year}. List the specific tools you find."
         )

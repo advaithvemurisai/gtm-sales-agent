@@ -54,7 +54,7 @@ Text:
         }
 
 
-def get_hiring_signals(company_name: str) -> Dict[str, Any]:
+def get_hiring_signals(company_name: str, company_website: str | None = None) -> Dict[str, Any]:
     """Find hiring signals for a company via web search of public job listings."""
     client = get_client()
 
@@ -70,8 +70,9 @@ def get_hiring_signals(company_name: str) -> Dict[str, Any]:
 
     try:
         year = date.today().year
+        identity = f" ({company_website})" if company_website else ""
         query = (
-            f"Find the roles {company_name} is hiring for now, using its careers page or job boards "
+            f"Find the roles {company_name}{identity} is hiring for now, using its careers page or job boards "
             f"such as Greenhouse, Lever, or LinkedIn ({year - 1}-{year}). List specific job titles and "
             f"departments, and say whether headcount looks like it is growing, stable, or shrinking."
         )

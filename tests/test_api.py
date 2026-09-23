@@ -30,6 +30,18 @@ def test_analyze_hides_internal_errors(monkeypatch):
     assert response.json()["detail"] == "Analysis failed. Check the server logs for details."
 
 
+def test_analyze_returns_paused_for_credit_balance_error(monkeypatch):
+    class CreditError(Exception):
+        status_code = 400
+
+    monkeypatch.setattr("backend.app._request_windows", {})
+    monkeypatch.setattr("backend.app.infer_icp_signals", lambda description: (_ for _ in ()).throw(CreditError("credit balance is too low")))
+    response = TestClient(app).post("/analyze", json={"company_name": "Example", "product_description": "B2B analytics"})
+
+    assert response.status_code == 503
+    assert response.json() == {"detail": "Live research is paused right now.", "code": "demo_paused"}
+
+
 def test_analyze_has_a_rate_limit(monkeypatch):
     monkeypatch.setattr("backend.app._request_windows", {"analyze": __import__("collections").deque()})
     monkeypatch.setattr("backend.app.infer_icp_signals", lambda description: {})
@@ -89,6 +101,31 @@ def test_analyze_uses_reviewed_icp_instead_of_inferring(monkeypatch):
     assert response.status_code == 200
     assert seen["icp_profile"]["tech_signals"] == ["Salesforce", "HubSpot"]
     assert response.json()["icp_profile"]["raw_description"] == "B2B analytics"
+
+
+def test_analyze_forwards_company_website(monkeypatch):
+    seen = {}
+    _stub_pipeline(monkeypatch, seen)
+    monkeypatch.setattr("backend.app.infer_icp_signals", lambda description: {})
+
+    response = TestClient(app).post("/analyze", json={
+        "company_name": "Example",
+        "product_description": "B2B analytics",
+        "company_website": "https://example.com",
+    })
+
+    assert response.status_code == 200
+    assert seen["company_website"] == "https://example.com"
+
+
+def test_analyze_rejects_oversized_company_website():
+    response = TestClient(app).post("/analyze", json={
+        "company_name": "Example",
+        "product_description": "B2B analytics",
+        "company_website": "x" * 201,
+    })
+
+    assert response.status_code == 422
 
 
 @pytest.mark.parametrize("icp_profile", [

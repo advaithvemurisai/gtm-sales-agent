@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import InputPanel from './components/InputPanel';
 import VerdictCard from './components/VerdictCard';
 import EvidencePanel from './components/EvidencePanel';
@@ -9,6 +9,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000
 // Versioned so results saved under an older response shape are never read back.
 const PRODUCT_KEY = 'gtm-agent:v2:product-description';
 const COMPANY_KEY = 'gtm-agent:v2:company-name';
+const WEBSITE_KEY = 'gtm-agent:v2:company-website';
 const HISTORY_KEY = 'gtm-agent:v2:history';
 const HISTORY_LIMIT = 8;
 const ICP_ITEM_MAX_LENGTH = 80;
@@ -46,6 +47,7 @@ function loadingMessage(seconds) {
 }
 
 function errorMessage(payload) {
+  if (payload?.detail?.code === 'demo_paused') return payload.detail.detail;
   if (typeof payload?.detail === 'string') return payload.detail;
   if (Array.isArray(payload?.detail)) return 'Some of the details were not accepted. Check the criteria and try again.';
   return 'Analysis failed. Please try again.';
@@ -83,9 +85,11 @@ function validateProfile(profile) {
 }
 
 function App() {
+  const healthStarted = useRef(false);
   const [phase, setPhase] = useState('input');
   const [companyData, setCompanyData] = useState(null);
   const [companyName, setCompanyName] = useState(() => storage.get(COMPANY_KEY, ''));
+  const [companyWebsite, setCompanyWebsite] = useState(() => storage.get(WEBSITE_KEY, ''));
   const [productDescription, setProductDescription] = useState(() => storage.get(PRODUCT_KEY, ''));
   const [history, setHistory] = useState(loadHistory);
   const [icpDraft, setIcpDraft] = useState(null);
@@ -93,11 +97,26 @@ function App() {
   const [copyStatus, setCopyStatus] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [lastRequest, setLastRequest] = useState(null);
+  const exampleModules = import.meta.glob('./examples/*.json', { eager: true, import: 'default' });
+  const examples = Object.values(exampleModules).map((example, index) => ({
+    ...example,
+    id: example.company_name || index,
+    label: example.verdict?.decision === 'PURSUE' ? 'Good fit' : example.verdict?.decision === 'WATCH' ? 'Worth watching' : 'Not a fit',
+    analyzed_at: new Date(example.analyzed_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }),
+  }));
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   useEffect(() => { storage.set(PRODUCT_KEY, productDescription); }, [productDescription]);
   useEffect(() => { storage.set(COMPANY_KEY, companyName); }, [companyName]);
+  useEffect(() => { storage.set(WEBSITE_KEY, companyWebsite); }, [companyWebsite]);
   useEffect(() => { storage.set(HISTORY_KEY, history); }, [history]);
+
+  useEffect(() => {
+    if (healthStarted.current) return;
+    healthStarted.current = true;
+    fetch(`${API_BASE_URL}/health`).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!loading) return undefined;
@@ -126,6 +145,8 @@ function App() {
     setError(null);
     setCompanyName(data.company_name);
     setProductDescription(data.product_description);
+    setCompanyWebsite(data.company_website || '');
+    setLastRequest({ ...data, icp_profile: icpProfile });
 
     try {
       const response = await fetch(`${API_BASE_URL}/analyze`, {
@@ -138,7 +159,9 @@ function App() {
 
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
-        throw new Error(errorMessage(payload));
+        const error = new Error(errorMessage(payload));
+        error.code = payload?.code || payload?.detail?.code;
+        throw error;
       }
 
       const result = await response.json();
@@ -148,7 +171,10 @@ function App() {
         ...current.filter((item) => item.company_name !== result.company_name),
       ].slice(0, HISTORY_LIMIT));
     } catch (err) {
-      setError(err.message);
+      const message = err.name === 'TypeError' || err.message === 'Failed to fetch'
+        ? "Couldn't reach the server. It may be starting up; try again in a minute."
+        : err.message;
+      setError({ message, code: err.code });
       console.error('Error:', err);
     } finally {
       setLoading(false);
@@ -185,15 +211,16 @@ function App() {
       setIcpError(problem);
       return;
     }
-    handleAnalyze({ company_name: companyData.company_name, product_description: productDescription }, profile);
+    handleAnalyze({ company_name: companyData.company_name, product_description: productDescription, company_website: companyWebsite }, profile);
   };
 
   return (
     <div className="app-shell">
-      <header className="app-header"><strong>GTM Agent</strong><span>Account research for confident outreach</span></header>
+      <header className="app-header"><strong>GTM Agent</strong><nav><a href="#how-it-works">How it works</a><a href="#example">Example</a></nav></header>
       {error && (
-        <div role="alert" style={{ padding: '1rem 1.5rem', background: 'rgba(248,81,73,0.1)', borderBottom: '1px solid rgba(248,81,73,0.35)', color: '#f85149', fontSize: 14 }}>
-          Error: {error}
+        <div className={`notice ${error.code === 'demo_paused' ? 'notice-paused' : 'notice-error'}`} role="alert">
+          <span>{error.code === 'demo_paused' ? 'Live research is paused right now. ' : error.message}</span>
+          {error.code === 'demo_paused' ? <a href="#example">See a real example below.</a> : error.message === "Couldn't reach the server. It may be starting up; try again in a minute." ? <button type="button" onClick={() => lastRequest && handleAnalyze(lastRequest, lastRequest.icp_profile)}>Try again</button> : null}
         </div>
       )}
 
@@ -215,7 +242,11 @@ function App() {
           setCompanyName={setCompanyName}
           productDescription={productDescription}
           setProductDescription={setProductDescription}
+          companyWebsite={companyWebsite}
+          setCompanyWebsite={setCompanyWebsite}
           history={history}
+          examples={examples}
+          onSelectExample={(example) => { setCompanyName(example.company_name); setProductDescription(example.product_description); showResult(example); }}
           onSelectHistory={(item) => {
             setCompanyName(item.company_name);
             setProductDescription(item.result.icp_profile?.raw_description || productDescription);
