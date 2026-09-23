@@ -1,39 +1,17 @@
-import os
-import json
 import logging
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
-from anthropic import Anthropic
 from typing import Dict, Any
+
+from anthropic import Anthropic
+
+from backend.config import HAIKU_MODEL
+from backend.llm import get_client, parse_json_object, response_text, run_web_search
 from backend.telemetry import log_anthropic_usage
-from backend.config import HAIKU_MODEL, SONNET_MODEL
 
 
 logger = logging.getLogger(__name__)
-
-
-def _run_search(query: str, client: Anthropic) -> tuple[str, list[str]]:
-    """Run a single web search and return concatenated text results."""
-    model = SONNET_MODEL
-    started_at = time.perf_counter()
-    response = client.messages.create(
-        model=model,
-        max_tokens=1024,
-        tools=[{"type": "web_search_20250305", "name": "web_search"}],
-        messages=[{"role": "user", "content": query}]
-    )
-    log_anthropic_usage(
-        logger,
-        operation="web_search.run_search",
-        model=model,
-        started_at=started_at,
-        response=response,
-    )
-    text_blocks = [block for block in response.content if getattr(block, "type", None) == "text"]
-    cited_blocks = [block for block in text_blocks if getattr(block, "citations", None) or []]
-    text = " ".join(block.text for block in (cited_blocks or text_blocks))
-    citations = [citation.url for block in text_blocks for citation in (getattr(block, "citations", None) or []) if getattr(citation, "url", None)]
-    return text, citations
 
 
 def parse_company_signals(company_name: str, fundamentals_text: str, client: Anthropic) -> dict:
@@ -58,7 +36,7 @@ Text:
     started_at = time.perf_counter()
     response = client.messages.create(
         model=model,
-        max_tokens=256,
+        max_tokens=1024,
         messages=[{"role": "user", "content": prompt}]
     )
     log_anthropic_usage(
@@ -70,10 +48,9 @@ Text:
     )
 
     try:
-        text = response.content[0].text.strip()
-        text = text.replace("```json", "").replace("```", "").strip()
-        return json.loads(text)
+        return parse_json_object(response_text(response))
     except Exception:
+        logger.warning("Could not parse company signals JSON for %s", company_name)
         return {
             "funding_stage": "Unknown",
             "total_funding": "Unknown",
@@ -86,7 +63,7 @@ Text:
 
 
 def get_web_search_data(company_name: str) -> Dict[str, Any]:
-    client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    client = get_client()
 
     web_search_data = {
         "company_name": company_name,
@@ -99,17 +76,20 @@ def get_web_search_data(company_name: str) -> Dict[str, Any]:
 
     try:
         fundamentals_query = (
-            f'"{company_name}" company funding stage '
-            f'employees headcount founded year revenue headquarters'
+            f"Find {company_name}'s funding stage, total funding, employee headcount, founding year, "
+            f"headquarters, and revenue estimate."
         )
-        fundamentals_text, fundamentals_urls = _run_search(fundamentals_query, client)
-        web_search_data["fundamentals"] = fundamentals_text
-
+        year = date.today().year
         news_query = (
-            f'"{company_name}" recent news {date.today().year - 1} {date.today().year} '
-            f'hiring growth product launch partnerships'
+            f"Find {company_name}'s most significant news from {year - 1}-{year}: funding, hiring, "
+            f"growth, product launches, and partnerships."
         )
-        news_text, news_urls = _run_search(news_query, client)
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            fundamentals_future = executor.submit(run_web_search, client, fundamentals_query, logger, "web_search.fundamentals")
+            news_future = executor.submit(run_web_search, client, news_query, logger, "web_search.news")
+            fundamentals_text, fundamentals_urls = fundamentals_future.result()
+            news_text, news_urls = news_future.result()
+        web_search_data["fundamentals"] = fundamentals_text
         web_search_data["news"] = news_text
 
         web_search_data["company_signals"] = parse_company_signals(

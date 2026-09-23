@@ -2,8 +2,6 @@
 
 GTM Agent is a sales intelligence demo for founders, GTM engineers, and account executives. Enter what you sell and a target company; it searches public web evidence, compares the signals with an inferred ICP, and returns a `PURSUE`, `WATCH`, or `DEPRIORITIZE` recommendation with confidence, citations, and failed-source warnings.
 
-The app presents an evidence-backed verdict with source links and confidence, so the result screen is the primary product walkthrough.
-
 ## Architecture
 
 ```mermaid
@@ -35,7 +33,15 @@ uvicorn backend.app:app --reload --port 8000
 cd frontend && npm install && npm run dev
 ```
 
-For deployment, run the backend with `uvicorn backend.app:app --host 0.0.0.0 --port $PORT` and set `VITE_API_BASE_URL` in the frontend deployment. Configure `ALLOWED_ORIGINS` to the exact frontend origin.
+## Deployment
+
+Run the backend behind your host's proxy with forwarded headers enabled, so the per-client rate limit sees real visitor IPs instead of the proxy's:
+
+```bash
+uvicorn backend.app:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
+```
+
+Set `ALLOWED_ORIGINS` to the exact frontend origin, and `VITE_API_BASE_URL` in the frontend deployment. `ANTHROPIC_SONNET_MODEL` and `ANTHROPIC_HAIKU_MODEL` override the default models (`claude-sonnet-5` and `claude-haiku-4-5`).
 
 ## Tests
 
@@ -45,7 +51,7 @@ pytest
 
 ## Known limitations
 
-- Search quality depends on Anthropic web-search availability and public company information.
+- Search quality depends on Anthropic web-search availability and public company information. An analysis can take a minute or more; each web search is capped at three queries and 90 seconds, and a search that times out is reported as an unavailable source rather than failing the verdict.
 - Technology and hiring signals are web evidence, not direct BuiltWith or careers API data.
 - The demo uses one shared API key, so production deployments should add authentication, durable rate limiting, usage budgets, and secret management.
 

@@ -1,7 +1,7 @@
 import logging
 import os
 import time
-from collections import defaultdict, deque
+from collections import deque
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -9,13 +9,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from backend.config import MAX_COMPANY_NAME_LENGTH, MAX_PRODUCT_DESCRIPTION_LENGTH
-from backend.agent.icp_conversation import infer_icp_signals
+from backend.agent.icp import infer_icp_signals
 from backend.agent.pipeline import run_evaluation_pipeline
 from backend.agent.verdict import format_verdict_display
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("gtm_agent.api")
-_request_windows = defaultdict(deque)
+_request_windows: dict[str, deque] = {}
 _RATE_LIMIT = 5
 _RATE_WINDOW_SECONDS = 60
 
@@ -52,19 +52,15 @@ class AnalyzeResponse(BaseModel):
 @app.post("/analyze")
 def analyze(request: AnalyzeRequest, http_request: Request) -> AnalyzeResponse:
     """
-    Run full evaluation pipeline: ICP conversation -> Phase 2 evaluation -> verdict.
-    For MVP, we skip the interactive ICP conversation and go straight to evaluation
-    with a default ICP profile.
+    Infer an ICP from the product description, gather web evidence about the
+    company, and return a PURSUE / WATCH / DEPRIORITIZE verdict with its evidence.
     """
     started_at = time.perf_counter()
+    # Behind a proxy this is the real client IP only when uvicorn runs with
+    # --proxy-headers and --forwarded-allow-ips (see README).
     client_key = http_request.client.host if http_request.client else "unknown"
-    now = time.monotonic()
-    window = _request_windows.setdefault(client_key, deque())
-    while window and now - window[0] > _RATE_WINDOW_SECONDS:
-        window.popleft()
-    if len(window) >= _RATE_LIMIT:
+    if not _allow_request(client_key, time.monotonic()):
         raise HTTPException(status_code=429, detail="Too many analysis requests. Please try again shortly.")
-    window.append(now)
     logger.info("Analyze request received for company=%s", request.company_name)
     try:
         # Infer all ICP fields from product description - nothing hardcoded
@@ -82,17 +78,17 @@ def analyze(request: AnalyzeRequest, http_request: Request) -> AnalyzeResponse:
 
         evidence = {
             "company_signals": result["web_search"]["raw_data"].get("company_signals", {}),
-            "builtwith": result["builtwith"]["summary"],
-            "careers": result["careers"]["summary"],
+            "technology": result["technology"]["summary"],
+            "hiring": result["hiring"]["summary"],
             "web_search": result["web_search"]["summary"],
             "source_errors": {
                 source: result[source]["raw_data"].get("error")
-                for source in ("builtwith", "careers", "web_search")
+                for source in ("technology", "hiring", "web_search")
                 if result[source]["raw_data"].get("error")
             },
             "source_urls": {
                 source: result[source]["raw_data"].get("source_urls", [])
-                for source in ("builtwith", "careers", "web_search")
+                for source in ("technology", "hiring", "web_search")
             },
         }
 
@@ -100,7 +96,7 @@ def analyze(request: AnalyzeRequest, http_request: Request) -> AnalyzeResponse:
             "decision": verdict["decision"],
             "signal_count": len(verdict.get("signals", [])),
             "reasoning_preview": verdict.get("reasoning", "")[:220],
-            "evidence_sources": ["company_signals", "builtwith", "careers", "web_search"],
+            "evidence_sources": ["company_signals", "technology", "hiring", "web_search"],
             "confidence": verdict.get("confidence", "unknown"),
         }
 
@@ -125,6 +121,19 @@ def analyze(request: AnalyzeRequest, http_request: Request) -> AnalyzeResponse:
             (time.perf_counter() - started_at) * 1000,
         )
         raise HTTPException(status_code=500, detail="Analysis failed. Check the server logs for details.")
+
+
+def _allow_request(client_key: str, now: float) -> bool:
+    """Sliding-window rate limit per client; drops idle clients so memory stays bounded."""
+    for key in [key for key, window in _request_windows.items() if not window or now - window[-1] > _RATE_WINDOW_SECONDS]:
+        del _request_windows[key]
+    window = _request_windows.setdefault(client_key, deque())
+    while window and now - window[0] > _RATE_WINDOW_SECONDS:
+        window.popleft()
+    if len(window) >= _RATE_LIMIT:
+        return False
+    window.append(now)
+    return True
 
 
 @app.get("/health")

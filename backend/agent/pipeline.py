@@ -1,30 +1,23 @@
 import logging
-import os
 import json
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
-from anthropic import Anthropic
 from backend.telemetry import log_anthropic_usage, timed_operation
-from backend.tools.builtwith import get_builtwith_data
-from backend.tools.careers_scraper import get_careers_page_data
+from backend.tools.tech_signals import get_tech_signals
+from backend.tools.hiring_signals import get_hiring_signals
 from backend.tools.web_search import get_web_search_data
 from backend.config import SONNET_MODEL
+from backend.llm import get_client, load_prompt, response_text
 
 logger = logging.getLogger("gtm_agent.pipeline")
 
-
-def _get_client():
-    return Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-
-
-def load_prompt(prompt_file: str) -> str:
-    """Load a prompt from the prompts directory."""
-    prompt_path = os.path.join(
-        os.path.dirname(__file__), "..", "prompts", prompt_file
-    )
-    with open(prompt_path, 'r') as f:
-        return f.read()
+_SECTION_NAMES = ("VERDICT", "DECISION", "REASONING", "WHY", "KEY SIGNALS", "SIGNALS", "KEY TAKEAWAYS", "CONFIDENCE")
+_SECTION_PATTERN = re.compile(
+    r"^[*_`#\s]*(" + "|".join(_SECTION_NAMES) + r")[*_`]*\s*:[*_`]*\s*(.*)$",
+    re.I,
+)
+_BULLET_PATTERN = re.compile(r"^[-•*]\s+")
 
 
 def run_evaluation_pipeline(
@@ -36,7 +29,7 @@ def run_evaluation_pipeline(
 
     Args:
         company_name: The company name
-        icp_profile: Structured ICP dict from Phase 1 (or stub defaults)
+        icp_profile: Structured ICP dict inferred from what the seller sells
 
     Returns:
         Dict with summaries and final verdict
@@ -45,44 +38,43 @@ def run_evaluation_pipeline(
     system_prompt = load_prompt("evaluation_system_prompt.txt")
 
     with ThreadPoolExecutor(max_workers=3) as executor:
-        builtwith_future = executor.submit(get_builtwith_data, company_name)
-        careers_future = executor.submit(get_careers_page_data, company_name)
+        technology_future = executor.submit(get_tech_signals, company_name)
+        hiring_future = executor.submit(get_hiring_signals, company_name)
         web_search_future = executor.submit(get_web_search_data, company_name)
-        builtwith_result = builtwith_future.result()
-        careers_result = careers_future.result()
+        technology_result = technology_future.result()
+        hiring_result = hiring_future.result()
         web_search_result = web_search_future.result()
 
+    web_search_error = web_search_result["raw_data"].get("error")
     with ThreadPoolExecutor(max_workers=4) as executor:
-        builtwith_summary_future = executor.submit(_summarize_tool_result, builtwith_result, "Technology Signals", system_prompt)
-        careers_summary_future = executor.submit(_summarize_tool_result, careers_result, "Hiring Signals", system_prompt)
+        technology_summary_future = executor.submit(_summarize_tool_result, technology_result, "Technology Signals", system_prompt)
+        hiring_summary_future = executor.submit(_summarize_tool_result, hiring_result, "Hiring Signals", system_prompt)
         fundamentals_summary_future = executor.submit(
             _summarize_tool_result,
-            {"raw_data": web_search_result["raw_data"]["fundamentals"], "error": web_search_result["raw_data"].get("error")},
+            {"raw_data": web_search_result["raw_data"]["fundamentals"], "error": web_search_error},
             "Company Fundamentals",
             system_prompt,
         )
         news_summary_future = executor.submit(
             _summarize_tool_result,
-            {"raw_data": web_search_result["raw_data"]["news"], "error": web_search_result["raw_data"].get("error")},
+            {"raw_data": web_search_result["raw_data"]["news"], "error": web_search_error},
             "Recent News",
             system_prompt,
         )
-        builtwith_summary = builtwith_summary_future.result()
-        careers_summary = careers_summary_future.result()
+        technology_summary = technology_summary_future.result()
+        hiring_summary = hiring_summary_future.result()
         fundamentals_summary = fundamentals_summary_future.result()
         news_summary = news_summary_future.result()
-    builtwith_result["summary"] = builtwith_summary
-    careers_result["summary"] = careers_summary
+    technology_result["summary"] = technology_summary
+    hiring_result["summary"] = hiring_summary
     web_search_result["summary"] = f"{fundamentals_summary}\n\n{news_summary}"
-    web_search_summary = web_search_result["summary"]
 
-    # Step 5: Generate verdict
     company_signals = web_search_result["raw_data"].get("company_signals", {})
     with timed_operation(logger, "generate_verdict", company=company_name):
         verdict = _generate_verdict(
             icp_profile or {},
-            builtwith_summary,
-            careers_summary,
+            technology_summary,
+            hiring_summary,
             fundamentals_summary,
             news_summary,
             company_signals,
@@ -92,14 +84,14 @@ def run_evaluation_pipeline(
     logger.info(
         "Evaluation pipeline completed for %s with decision=%s",
         company_name,
-        verdict.get("decision", "WATCH"),
+        verdict.get("decision"),
     )
 
     return {
         "company_name": company_name,
         "icp_profile": icp_profile,
-        "builtwith": builtwith_result,
-        "careers": careers_result,
+        "technology": technology_result,
+        "hiring": hiring_result,
         "web_search": web_search_result,
         "verdict": verdict,
     }
@@ -119,9 +111,10 @@ def _summarize_tool_result(result: dict, tool_name: str, system_prompt: str) -> 
 
     model = SONNET_MODEL
     started_at = time.perf_counter()
-    response = _get_client().messages.create(
+    response = get_client().messages.create(
         model=model,
-        max_tokens=256,
+        max_tokens=2000,
+        output_config={"effort": "low"},
         system=system_prompt,
         messages=[
             {"role": "user", "content": prompt}
@@ -135,15 +128,15 @@ def _summarize_tool_result(result: dict, tool_name: str, system_prompt: str) -> 
         response=response,
     )
 
-    summary = response.content[0].text
+    summary = response_text(response)
     logger.info("Completed summary for %s", tool_name)
     return summary
 
 
 def _generate_verdict(
     icp_profile: dict,
-    builtwith_summary: str,
-    careers_summary: str,
+    technology_summary: str,
+    hiring_summary: str,
     fundamentals_summary: str,
     news_summary: str,
     company_signals: dict,
@@ -165,8 +158,8 @@ def _generate_verdict(
         hiring_signals=", ".join(hiring_signals) or "none specified",
         budget_indicator=icp_profile.get("budget_indicator") or "not specified",
         raw_description=icp_profile.get("raw_description", "not specified"),
-        builtwith_summary=builtwith_summary,
-        careers_summary=careers_summary,
+        technology_summary=technology_summary,
+        hiring_summary=hiring_summary,
         fundamentals_summary=fundamentals_summary,
         news_summary=news_summary,
         company_signals_funding_stage=company_signals.get("funding_stage", "Unknown"),
@@ -178,9 +171,10 @@ def _generate_verdict(
 
     model = SONNET_MODEL
     started_at = time.perf_counter()
-    response = _get_client().messages.create(
+    response = get_client().messages.create(
         model=model,
-        max_tokens=512,
+        max_tokens=4000,
+        output_config={"effort": "medium"},
         system=system_prompt,
         messages=[
             {"role": "user", "content": verdict_prompt}
@@ -194,8 +188,15 @@ def _generate_verdict(
         response=response,
     )
 
-    verdict_text = response.content[0].text
-    return _parse_verdict(verdict_text)
+    return _parse_verdict(response_text(response))
+
+
+def _section_heading(line: str) -> tuple[str, str] | None:
+    """Return (SECTION, rest of line) for a heading like '**Verdict:** PURSUE'."""
+    match = _SECTION_PATTERN.match(line)
+    if not match:
+        return None
+    return match.group(1).upper(), match.group(2).strip()
 
 
 def _parse_verdict(verdict_text: str) -> dict:
@@ -206,57 +207,48 @@ def _parse_verdict(verdict_text: str) -> dict:
         "raw_text": verdict_text,
         "decision": None,
         "reasoning": "",
-        "signals": []
+        "signals": [],
+        "confidence": "unknown",
     }
 
     lines = [line.strip() for line in verdict_text.splitlines() if line.strip()]
 
     for i, line in enumerate(lines):
-        normalized_line = re.sub(
-            r"^[*_`]*(VERDICT|DECISION|REASONING|WHY|KEY SIGNALS|SIGNALS|KEY TAKEAWAYS|CONFIDENCE)[*_`]*\s*:[*_`]*",
-            lambda match: f"{match.group(1)}:",
-            line,
-            flags=re.I,
-        ).strip()
-        if re.match(r"^(VERDICT|DECISION)\s*:", normalized_line, re.I):
-            decision_text = normalized_line.split(":", 1)[1].strip()
+        heading = _section_heading(line)
+        if not heading:
+            continue
+        section, rest = heading
+
+        if section in ("VERDICT", "DECISION"):
             for option in ["PURSUE", "DEPRIORITIZE", "WATCH"]:
-                if option in decision_text.upper():
+                if option in rest.upper():
                     verdict["decision"] = option
                     break
 
-        elif re.match(r"^(REASONING|WHY)\s*:", normalized_line, re.I):
-            reasoning = normalized_line.split(":", 1)[1].strip()
-            j = i + 1
-            while j < len(lines):
-                next_line = lines[j]
-                next_normalized_line = re.sub(r"^[*_`]*(KEY SIGNALS|SIGNALS|KEY TAKEAWAYS|CONFIDENCE)[*_`]*\s*:[*_`]*", r"\1:", next_line, flags=re.I)
-                if re.match(r"^(KEY SIGNALS|SIGNALS|KEY TAKEAWAYS|CONFIDENCE)\s*:", next_normalized_line, re.I):
+        elif section in ("REASONING", "WHY"):
+            reasoning_lines = [rest]
+            for next_line in lines[i + 1:]:
+                if _section_heading(next_line):
                     break
-                if next_line:
-                    reasoning += " " + next_line
-                j += 1
-            verdict["reasoning"] = re.sub(r"\s+", " ", reasoning).strip()
+                reasoning_lines.append(next_line)
+            verdict["reasoning"] = re.sub(r"\s+", " ", " ".join(reasoning_lines)).strip()
 
-        elif re.match(r"^(KEY SIGNALS|SIGNALS|KEY TAKEAWAYS)\s*:", normalized_line, re.I):
-            for j in range(i + 1, len(lines)):
-                signal_line = lines[j].strip()
-                if re.match(r"^[-•*]\s+", signal_line):
-                    signal = signal_line[2:].strip()
-                    if signal:
-                        verdict["signals"].append(re.sub(r"\*\*([^*]+)\*\*", r"\1", signal))
-                elif signal_line and not signal_line.startswith("-"):
+        elif section in ("KEY SIGNALS", "SIGNALS", "KEY TAKEAWAYS"):
+            for signal_line in lines[i + 1:]:
+                if not _BULLET_PATTERN.match(signal_line):
                     break
+                signal = _BULLET_PATTERN.sub("", signal_line)
+                signal = re.sub(r"\*\*([^*]+)\*\*", r"\1", signal)
+                signal = re.sub(r"\s+", " ", signal).strip()
+                if signal:
+                    verdict["signals"].append(signal)
 
-        elif re.match(r"^CONFIDENCE\s*:", normalized_line, re.I):
-            confidence = normalized_line.split(":", 1)[1].strip().lower().split()[0]
-            if confidence in {"low", "medium", "high"}:
-                verdict["confidence"] = confidence
+        elif section == "CONFIDENCE":
+            match = re.search(r"\b(low|medium|high)\b", rest, re.I)
+            if match:
+                verdict["confidence"] = match.group(1).lower()
 
     if not verdict["decision"] or not verdict["reasoning"]:
         raise ValueError("Verdict response was missing a decision or reasoning section")
-
-    verdict["reasoning"] = re.sub(r"\s+", " ", verdict["reasoning"]).strip()
-    verdict["signals"] = [re.sub(r"\s+", " ", signal).strip() for signal in verdict["signals"] if re.sub(r"\s+", " ", signal).strip()]
 
     return verdict

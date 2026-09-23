@@ -18,17 +18,17 @@ def test_run_evaluation_pipeline_and_format_verdict(monkeypatch):
         'KEY SIGNALS:\n'
         '- Funding stage mismatch (web search / fundamentals)\n'
         '- No strong hiring signals for ICP roles\n'
-        '- BuiltWith shows legacy ERP and low cloud adoption\n'
+        '- Technology signals show legacy ERP and low cloud adoption\n'
     )
 
-    monkeypatch.setattr('backend.agent.pipeline.get_builtwith_data', lambda company_name: {
+    monkeypatch.setattr('backend.agent.pipeline.get_tech_signals', lambda company_name: {
         'raw_data': {'company_name': company_name, 'technologies': ['ERP']},
-        'summary': 'BuiltWith summary placeholder.',
+        'summary': 'Technology summary placeholder.',
     })
 
-    monkeypatch.setattr('backend.agent.pipeline.get_careers_page_data', lambda company_name: {
+    monkeypatch.setattr('backend.agent.pipeline.get_hiring_signals', lambda company_name: {
         'raw_data': {'company_name': company_name, 'roles': ['Operations']},
-        'summary': 'Careers summary placeholder.',
+        'summary': 'Hiring summary placeholder.',
     })
 
     monkeypatch.setattr('backend.agent.pipeline.get_web_search_data', lambda company_name: {
@@ -54,7 +54,7 @@ def test_run_evaluation_pipeline_and_format_verdict(monkeypatch):
         'signals': [
             'Funding stage mismatch (web search / fundamentals)',
             'No strong hiring signals for ICP roles',
-            'BuiltWith shows legacy ERP and low cloud adoption',
+            'Technology signals show legacy ERP and low cloud adoption',
         ],
     })
 
@@ -72,8 +72,8 @@ def test_run_evaluation_pipeline_and_format_verdict(monkeypatch):
 
     assert result['company_name'] == 'Test Company'
     assert result['verdict']['decision'] == 'DEPRIORITIZE'
-    assert result['builtwith']['summary'] == summary_text
-    assert result['careers']['summary'] == summary_text
+    assert result['technology']['summary'] == summary_text
+    assert result['hiring']['summary'] == summary_text
     assert result['web_search']['summary'] == f"{summary_text}\n\n{summary_text}"
 
     formatted = format_verdict_display(result['verdict'])

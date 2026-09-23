@@ -34,8 +34,8 @@ def test_analyze_has_a_rate_limit(monkeypatch):
     monkeypatch.setattr("backend.app.infer_icp_signals", lambda description: {})
     monkeypatch.setattr("backend.app.run_evaluation_pipeline", lambda **kwargs: {
         "web_search": {"raw_data": {"company_signals": {}, "fundamentals": "", "news": ""}, "summary": ""},
-        "builtwith": {"raw_data": {}, "summary": ""},
-        "careers": {"raw_data": {}, "summary": ""},
+        "technology": {"raw_data": {}, "summary": ""},
+        "hiring": {"raw_data": {}, "summary": ""},
         "verdict": {"decision": "WATCH", "reasoning": "Limited evidence.", "signals": []},
     })
     client = TestClient(app)
@@ -45,3 +45,16 @@ def test_analyze_has_a_rate_limit(monkeypatch):
 
     response = client.post("/analyze", json=payload)
     assert response.status_code == 429
+
+def test_rate_limit_is_per_client_and_forgets_idle_clients(monkeypatch):
+    from backend import app as app_module
+
+    monkeypatch.setattr(app_module, "_request_windows", {})
+    for _ in range(app_module._RATE_LIMIT):
+        assert app_module._allow_request("10.0.0.1", 0.0)
+    assert not app_module._allow_request("10.0.0.1", 1.0)
+    assert app_module._allow_request("10.0.0.2", 1.0)
+
+    later = app_module._RATE_WINDOW_SECONDS + 5.0
+    assert app_module._allow_request("10.0.0.3", later)
+    assert set(app_module._request_windows) == {"10.0.0.3"}

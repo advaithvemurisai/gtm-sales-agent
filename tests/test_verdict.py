@@ -33,3 +33,18 @@ def test_format_verdict_display_defaults_confidence_to_unknown_or_given_value():
     })
 
     assert result["confidence"] == "low"
+
+@pytest.mark.parametrize("line, expected", [
+    ("CONFIDENCE:", "unknown"),
+    ("CONFIDENCE: Medium.", "medium"),
+    ("CONFIDENCE: [HIGH]", "high"),
+    ("Confidence: **High**", "high"),
+    ("**CONFIDENCE:** Low - two sources failed", "low"),
+])
+def test_parse_verdict_reads_confidence_leniently(line, expected):
+    result = _parse_verdict(
+        "VERDICT: WATCH\nREASONING: Evidence is mixed.\nKEY SIGNALS:\n* Hiring is unclear\n" + line
+    )
+
+    assert result["confidence"] == expected
+    assert result["signals"] == ["Hiring is unclear"]

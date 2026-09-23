@@ -1,15 +1,10 @@
-import os
 import logging
 import time
-from anthropic import Anthropic
 from backend.telemetry import log_anthropic_usage
-from backend.config import HAIKU_MODEL, SONNET_MODEL
+from backend.config import HAIKU_MODEL
+from backend.llm import get_client, parse_json_object, response_text
 
 logger = logging.getLogger("gtm_agent.icp")
-
-
-def _get_client():
-    return Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 
 def infer_icp_signals(product_description: str) -> dict:
@@ -17,7 +12,6 @@ def infer_icp_signals(product_description: str) -> dict:
     Use Haiku to infer all five ICP fields from product description.
     Returns structured dict or safe fallback with nulls.
     """
-    import json
 
     prompt = f"""You are an expert B2B sales strategist. Given a product description, infer the ideal customer profile.
 
@@ -44,9 +38,9 @@ Rules:
     try:
         model = HAIKU_MODEL
         started_at = time.perf_counter()
-        response = _get_client().messages.create(
+        response = get_client().messages.create(
             model=model,
-            max_tokens=512,
+            max_tokens=1024,
             messages=[{"role": "user", "content": prompt}]
         )
         log_anthropic_usage(
@@ -56,9 +50,7 @@ Rules:
             started_at=started_at,
             response=response,
         )
-        text = response.content[0].text.strip()
-        text = text.replace("```json", "").replace("```", "").strip()
-        return json.loads(text)
+        return parse_json_object(response_text(response))
     except Exception:
         logger.exception("ICP inference failed")
         return {

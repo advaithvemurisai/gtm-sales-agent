@@ -20,10 +20,10 @@ COMPANY SIGNALS (extracted from web search):
 EVIDENCE:
 
 TECHNOLOGY SIGNALS (web search):
-{builtwith_summary}
+{technology_summary}
 
 HIRING SIGNALS (web search):
-{careers_summary}
+{hiring_summary}
 
 COMPANY FUNDAMENTALS (Web Search):
 {fundamentals_summary}

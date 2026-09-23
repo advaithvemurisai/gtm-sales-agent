@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import FormattedText from './FormattedText';
 
-const SOURCE_LABELS = { builtwith: 'Technology signals', careers: 'Hiring signals', web_search: 'Web search' };
+const SOURCE_LABELS = { technology: 'Technology signals', hiring: 'Hiring signals', web_search: 'Web search' };
 
 function sourceDomain(url) {
   try {
@@ -45,8 +45,8 @@ function SignalGrid({ signals }) {
 const SECTIONS = [
   { id: 'company_signals', title: 'Company Signals', icon: 'ti-chart-infographic', type: 'structured' },
   { id: 'web_search', title: 'Web Search', icon: 'ti-world-search', type: 'text' },
-  { id: 'builtwith', title: 'Technology Signals', icon: 'ti-stack-2', type: 'text' },
-  { id: 'careers', title: 'Hiring Signals', icon: 'ti-users', type: 'text' },
+  { id: 'technology', title: 'Technology Signals', icon: 'ti-stack-2', type: 'text' },
+  { id: 'hiring', title: 'Hiring Signals', icon: 'ti-users', type: 'text' },
 ];
 
 function EvidencePanel({ evidence }) {
