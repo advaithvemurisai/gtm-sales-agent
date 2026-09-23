@@ -1,0 +1,106 @@
+{
+  "company_name": "Notion",
+  "icp_profile": {
+    "target_company_size": "50-500",
+    "funding_stage": [
+      "Series A",
+      "Series B",
+      "Series B+"
+    ],
+    "tech_signals": [
+      "Salesforce",
+      "Okta",
+      "Jira",
+      "AWS",
+      "Stripe"
+    ],
+    "hiring_signals": [
+      "VP of Security",
+      "Compliance Officer",
+      "Security Engineer",
+      "Head of Risk",
+      "VP of Operations"
+    ],
+    "budget_indicator": "mid-market",
+    "raw_description": "Security compliance automation for scaling SaaS companies."
+  },
+  "verdict": {
+    "decision": "DEPRIORITIZE",
+    "reasoning": "Company size of 1000+ employees (web search) far exceeds the target range of 50-500, and funding stage is \"Growth\"/late-stage with an $11B valuation and $600M revenue (web search), not matching the targeted Series A/B/B+ stages. While hiring shows a Security function (web search) and AWS is present in the tech stack, the core company size and funding stage mismatches are strong deprioritize signals per ICP.",
+    "signals": [
+      "Headcount of 1000+ (700-1,200 per fundamentals) exceeds target company size of 50-500 (web search: company fundamentals)",
+      "Funding stage is late-stage/Growth ($270M tender at $11B valuation) vs. targeted Series A/B/B+ (web search: recent news)",
+      "AWS present in tech stack (partial match to target tech signals), but no Salesforce, Okta, Jira, or Stripe detected (web search: technology signals)"
+    ],
+    "color": "red",
+    "confidence": "high",
+    "next_step": "Deprioritize for now; revisit only if Notion spins off a smaller business unit or subsidiary that independently falls into the 50-500 headcount/Series A-B range, or if a specific security/compliance buying signal (e.g., a VP of Security or Compliance Officer hire) emerges that indicates a discrete, addressable budget pocket within the larger org."
+  },
+  "evidence": {
+    "company_signals": {
+      "funding_stage": "Growth",
+      "total_funding": "$418M",
+      "headcount": 1000,
+      "headcount_range": "1000+",
+      "founded_year": 2013,
+      "headquarters": "San Francisco, California",
+      "revenue_estimate": "$600M"
+    },
+    "technology": "Notion runs a mature, engineering-heavy stack (React/TypeScript frontend, Ruby on Rails/PostgreSQL backend, full AWS infrastructure with Kubernetes, Terraform, and DataDog) indicating a sophisticated, scaled engineering organization rather than an early-stage startup. Their data infrastructure (Snowflake, Spark, PySpark, Scala, Vector DB) points to significant investment in analytics and data engineering, suggesting maturity in data-driven decision-making. Notably, there is no CRM/sales tooling detected, and integrations lean toward productivity/collaboration tools (Slack, Google Docs, Asana, Trello), reflecting their core PLG productivity-suite identity rather than a sales-tech-forward organization.",
+    "hiring": "Notion is actively hiring across Engineering, Security, Sales, Customer Success, Finance, and Marketing, signaling broad organizational growth rather than a single-function push. Notable roles like Account Executive (Mid-Market/Enterprise), Solutions Consultant, and Outcome Architects Manager indicate expanding go-to-market and customer-facing capacity, suggesting increased deal volume and enterprise focus. The presence of AI-focused engineering and research roles (AI Evaluations, Software Engineer AI) points to continued product investment in AI capabilities, relevant for positioning AI-related solutions or integrations.",
+    "web_search": "Notion is a mature, well-capitalized late-stage startup (San Francisco, founded 2013) valued at $11B with $343M-$418M total funding, having recently completed a $270M tender offer in January 2026. The company shows strong growth momentum with revenue scaling from $67M (2022) to $600M ARR (2025) and a workforce of roughly 700-1,200 employees, indicating a well-funded, product-led SaaS company in expansion mode. This profile suggests strong buying power and organizational maturity, making it a viable target for enterprise-grade sales solutions, though headcount/revenue estimate variance warrants validation during outreach.\n\nNotion is scaling rapidly and self-funded, hitting $500M ARR (Sept 2025, expected to double) with over 100M users and adoption across 50%+ of Fortune 500 companies, signaling strong enterprise budget and expansion potential. Its aggressive AI-first roadmap (Notion 3.0\u20133.6, Custom Agents, Developer Platform, Agent APIs) shows heavy technical investment in agentic workflows and integrations (Slack, Teams, SharePoint, Gmail, Claude, Cursor), indicating a sophisticated engineering org open to partnerships and dev-tool integrations. Recent $270M tender at $11B valuation (Jan 2026) and rising competitive pressure from Microsoft, Google, and Airtable suggest urgency to differentiate\u2014making Notion a strong target for vendors selling AI infrastructure, developer tooling, or enterprise security/compliance solutions.",
+    "source_errors": {},
+    "source_urls": {
+      "technology": [
+        "https://www.techaheadcorp.com/blog/tech-stack-powering-notion-block-based-editor/",
+        "https://www.engineering.fyi/company/notion",
+        "https://slashdev.io/blog/breaking-down-notions-tech-stack",
+        "https://www.notion.com/blog/building-and-scaling-notions-data-lake",
+        "https://platformchecker.com/blog/notion-tech-stack-2026",
+        "https://www.notion.com/blog",
+        "https://stackshare.io/notion-api"
+      ],
+      "hiring": [
+        "https://www.notion.com/careers",
+        "https://builtin.com/company/notion/jobs",
+        "https://www.builtinnyc.com/company/notion/jobs",
+        "https://aipplify.com/companies/notion"
+      ],
+      "web_search": [
+        "https://bullet.so/blog/history-of-notion-everything-from-users-funding-and-more/",
+        "https://www.crunchbase.com/organization/notion-so",
+        "https://tracxn.com/d/companies/notion/__LQ8wyN9zLT-OwulhqbMYvw0Ayznneiugbu_OaKuGD4U",
+        "https://research.contrary.com/company/notion",
+        "https://getlatka.com/companies/notion",
+        "https://pitchbook.com/profiles/company/168506-47",
+        "https://taptwicedigital.com/stats/notion",
+        "https://startupintros.com/orgs/notion",
+        "https://www.notion.com/blog/gic-sequoia-index-purchase-notion-shares",
+        "https://www.cnbc.com/2026/05/19/notion-cnbc-disruptor-50-ranking.html",
+        "https://www.bloomberg.com/news/articles/2025-12-02/notion-is-said-to-weigh-tender-offer-at-12-billion-valuation",
+        "https://sacra.com/c/notion/",
+        "https://sqmagazine.co.uk/notion-statistics/",
+        "https://en.wikipedia.org/wiki/Notion_(productivity_software)",
+        "https://www.notion.com/releases/2026-01-20",
+        "https://dataconomy.com/2026/05/14/notion-launches-developer-platform-for-ai-workflows-and-agents/",
+        "https://techcrunch.com/2026/05/13/notion-just-turned-its-workspace-into-a-hub-for-ai-agents/",
+        "https://winbuzzer.com/2026/05/14/notion-just-turned-its-workspace-into-a-hub-for-ai-xcxwbn/",
+        "https://releasebot.io/updates/notion"
+      ]
+    }
+  },
+  "summary": {
+    "decision": "DEPRIORITIZE",
+    "signal_count": 3,
+    "reasoning_preview": "Company size of 1000+ employees (web search) far exceeds the target range of 50-500, and funding stage is \"Growth\"/late-stage with an $11B valuation and $600M revenue (web search), not matching the targeted Series A/B/B+",
+    "evidence_sources": [
+      "company_signals",
+      "technology",
+      "hiring",
+      "web_search"
+    ],
+    "confidence": "high"
+  },
+  "product_description": "Security compliance automation for scaling SaaS companies.",
+  "analyzed_at": "2026-09-23T21:44:32.987409+00:00"
+}

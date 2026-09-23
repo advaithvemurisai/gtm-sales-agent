@@ -4,7 +4,7 @@
 
 **Live demo:** [gtm-sales-agent.vercel.app](https://gtm-sales-agent.vercel.app)
 
-![A Deprioritize verdict for Vercel with high confidence, a recommended next step, key signals, and the ideal customer profile used](frontend/public/result.png)
+![A saved example: a Watch verdict for Linear with medium confidence, a recommended next step, key signals, and the ideal customer profile used](frontend/public/result.png)
 
 ## What a seller gets
 
@@ -16,7 +16,7 @@
 
 The landing page is written for founders, SDRs, AEs, and RevOps: enter what you sell, the account, and optionally its website. It explains the workflow, shows the evidence-first result format, and keeps recent reviews in the browser. Company websites help disambiguate accounts with similar names.
 
-Saved landing-page examples live in `frontend/src/examples/` when they have been recorded. To create or refresh them, set `ANTHROPIC_API_KEY` and run `python scripts/record_examples.py`. This calls the live Anthropic pipeline and incurs API charges, so it is intentionally not part of the normal test or build steps. Until examples are recorded, the landing page shows the real result screenshot from `frontend/public/result.png`.
+The landing page shows three saved examples (Linear, Attio, Notion) recorded from real analyses in `frontend/src/examples/`. They open instantly and cost nothing to view, so the demo works even when live research is paused. To refresh them, set `ANTHROPIC_API_KEY` and run `python scripts/record_examples.py`; it calls the live pipeline and incurs API charges, so it is not part of the normal test or build steps.
 
 If the shared demo account has no Anthropic credits, live research returns a calm paused state with a link to the saved example instead of a generic server error. Network failures explain that the server may be waking and offer a retry.
 

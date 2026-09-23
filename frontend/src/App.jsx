@@ -104,7 +104,10 @@ function App() {
   const [error, setError] = useState(null);
   const [lastRequest, setLastRequest] = useState(null);
   const exampleModules = import.meta.glob('./examples/*.json', { eager: true, import: 'default' });
-  const examples = Object.values(exampleModules).map((example, index) => ({
+  const DECISION_ORDER = { PURSUE: 0, WATCH: 1, DEPRIORITIZE: 2 };
+  const examples = Object.values(exampleModules)
+    .sort((a, b) => (DECISION_ORDER[a.verdict?.decision] ?? 3) - (DECISION_ORDER[b.verdict?.decision] ?? 3))
+    .map((example, index) => ({
     ...example,
     id: example.company_name || index,
     label: example.verdict?.decision === 'PURSUE' ? 'Good fit' : example.verdict?.decision === 'WATCH' ? 'Worth watching' : 'Not a fit',
@@ -212,7 +215,12 @@ function App() {
       setIcpError(problem);
       return;
     }
-    handleAnalyze({ company_name: companyData.company_name, product_description: productDescription, company_website: companyWebsite }, profile);
+    // Rerun with the product this result was analyzed for, which may be a saved example's.
+    handleAnalyze({
+      company_name: companyData.company_name,
+      product_description: companyData.icp_profile?.raw_description || productDescription,
+      company_website: companyData.saved_example ? undefined : companyWebsite,
+    }, profile);
   };
 
   return (
@@ -248,7 +256,7 @@ function App() {
           setCompanyWebsite={setCompanyWebsite}
           history={history}
           examples={examples}
-          onSelectExample={(example) => { setCompanyName(example.company_name); setProductDescription(example.product_description); showResult(example); }}
+          onSelectExample={(example) => showResult({ ...example, saved_example: true })}
           onSelectHistory={(item) => {
             setCompanyName(item.company_name);
             setProductDescription(item.result.icp_profile?.raw_description || productDescription);
@@ -259,6 +267,12 @@ function App() {
 
       {!loading && phase === 'result' && companyData && (
         <div style={{ maxWidth: 760, margin: '0 auto', padding: '2rem 1rem' }}>
+          {companyData.saved_example && (
+            <p className="saved-banner">
+              Saved example · analyzed {companyData.analyzed_at} · selling &ldquo;{companyData.product_description?.replace(/\.$/, '')}&rdquo;{' '}·{' '}
+              <button type="button" onClick={handleStartOver}>Research your own account</button>
+            </p>
+          )}
           <VerdictCard verdict={companyData.verdict} company={companyData.company_name} />
           <div className="result-actions">
             <button className="secondary-button" type="button" onClick={handleCopy}>Copy summary</button>

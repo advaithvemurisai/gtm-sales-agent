@@ -1,0 +1,105 @@
+{
+  "company_name": "Attio",
+  "icp_profile": {
+    "target_company_size": "200-2000",
+    "funding_stage": [
+      "Series B",
+      "Series C",
+      "Growth"
+    ],
+    "tech_signals": [
+      "Salesforce",
+      "HubSpot",
+      "Marketo",
+      "Segment",
+      "Lookalike"
+    ],
+    "hiring_signals": [
+      "VP of Revenue Operations",
+      "Director of Sales Operations",
+      "Revenue Operations Manager",
+      "Chief Revenue Officer",
+      "VP of Finance"
+    ],
+    "budget_indicator": "mid-market",
+    "raw_description": "Data warehouse and analytics platform for revenue operations teams."
+  },
+  "verdict": {
+    "decision": "DEPRIORITIZE",
+    "reasoning": "Headcount of 51-200 (web search) falls below the target company size of 200-2000, and revenue estimate of $3M-$8M suggests limited budget for a mid-market analytics platform despite strong funding reserves. Funding stage of Series B matches the target funding criteria, but none of the specified technology signals (Salesforce, HubSpot, Marketo, Segment) or hiring signals (VP Revenue Operations, Director Sales Ops, CRO, VP Finance) appear in the evidence\u2014hiring is focused on SDRs, AEs, and engineers rather than RevOps/Finance leadership.",
+    "signals": [
+      "Headcount of 51-200 (web search) is below the 200-2000 target company size range",
+      "Funding stage Series B (web search) matches the targeted funding stage",
+      "No matching technology tools or RevOps/Finance hiring roles found in tech and hiring signal summaries (web search)"
+    ],
+    "color": "red",
+    "confidence": "medium",
+    "next_step": "Revisit in 6-12 months once headcount crosses into the 200+ range and check for RevOps or Sales Ops hiring activity, which would indicate emerging need for a dedicated analytics/data warehouse layer as they scale post-Series B."
+  },
+  "evidence": {
+    "company_signals": {
+      "funding_stage": "Series B",
+      "total_funding": "$141M",
+      "headcount": 177,
+      "headcount_range": "51-200",
+      "founded_year": 2017,
+      "headquarters": "London, United Kingdom",
+      "revenue_estimate": "$3M-$8M"
+    },
+    "technology": "Attio runs a modern, cloud-native engineering stack (React/Remix frontend, Rust/Node.js backend, GCP + Kubernetes + Cloudflare infrastructure), indicating a technically sophisticated, engineering-driven organization likely to evaluate vendors on technical merit rather than just sales pitch. Their use of AI/agent tooling (\"Ask Attio,\" Model Context Protocol, Thread Agent) signals active investment in AI-native product development, suggesting openness to modern AI/dev-tool vendors. Stack includes typical SaaS/PLG tooling (Stripe, Intercom, Mixpanel, Datadog, Sentry), consistent with a scaling B2B SaaS company with product-led growth motions.",
+    "hiring": "Attio is actively expanding across the full GTM stack\u2014hiring SDRs, Account Executives, Solutions Engineers, and a Customer Success Manager\u2014signaling growing sales capacity and pipeline investment targeting SMB/Mid-Market segments. Parallel investment in engineering (Forward Deployed Engineer, Software/Design Engineers) and Growth Marketing suggests the company is scaling both product delivery and demand generation simultaneously. This broad, multi-department hiring pattern with a \"growing\" headcount signal indicates healthy momentum and increasing capacity to engage and support new customers.",
+    "web_search": "Attio is a London-based Series B CRM startup (founded 2017, ~$124-141M raised, most recently $52M in August 2025) backed by top-tier VCs including GV and Redpoint, signaling strong investor confidence and growth capital for AI-driven product expansion. Headcount estimates vary widely (51-177 employees), suggesting a company in active scaling mode, while revenue ($3-8M estimated) and 4x ARR growth with 5,000 paying customers (including notable names like Lovable and Granola) indicate strong product-market fit and momentum. This profile suggests a growth-stage company likely investing in tooling, headcount, and infrastructure to support rapid customer and revenue expansion.\n\nAttio raised a $52M Series B (August 2025, led by GV, total funding $116\u2013141M), signaling strong capital reserves and investor confidence to fund aggressive scaling. The company shows explosive growth momentum\u20145,000 paying customers, projected 4X ARR growth in 2025, and recognition as the fastest-growing CRM vendor on Ramp's data\u2014indicating a well-resourced, expanding buyer with likely growing headcount and tooling needs. Rapid product expansion (App SDK, agentic AI, MCP integrations, Developer Platform) suggests active investment in engineering and infrastructure, making Attio a strong prospect for vendors selling into scaling, AI-forward SaaS orgs with technical buying centers.",
+    "source_errors": {},
+    "source_urls": {
+      "technology": [
+        "https://stackshare.io/attio/attio",
+        "https://attio.com/engineering/blog",
+        "https://attio.com/engineering/blog/ask-attio-a-technical-look-at-our-new-agent",
+        "https://attio.com/engineering/blog/you-cant-just-prompt-your-way-to-great-ai-features",
+        "https://attio.com/engineering/blog/where-s-the-technical-challenge-in-crm-anyway-",
+        "https://rocketreach.co/attio-technology-stack_b45da606fc675178"
+      ],
+      "hiring": [
+        "https://builtin.com/company/attio/jobs",
+        "https://www.ziprecruiter.com/co/attio/Jobs/--in-New-York",
+        "https://attio.com/careers/open-application",
+        "https://scoutify.com/companies/attio/",
+        "https://www.trueup.io/co/attio/jobs",
+        "https://app.welcometothejungle.com/companies/Attio"
+      ],
+      "web_search": [
+        "https://seedtable.com/companies/attio",
+        "https://app.dealroom.co/companies/attio",
+        "https://www.vestbee.com/insights/articles/attio-secures-52-m",
+        "https://www.crunchbase.com/organization/attio",
+        "https://pitchbook.com/profiles/company/226657-45",
+        "https://tracxn.com/d/companies/attio/__zXaorGoGUFFCntq5i6GuYbFjA5y0l4NPgP5t1R3FhXg",
+        "https://www.arr.club/attio",
+        "https://builtin.com/company/attio/faq/stability-growth",
+        "https://www.prnewswire.com/news-releases/attio-raises-52m-series-b-to-scale-the-first-ai-native-crm-for-go-to-market-builders-302538357.html",
+        "https://tracxn.com/d/companies/attio/__zXaorGoGUFFCntq5i6GuYbFjA5y0l4NPgP5t1R3FhXg/funding-and-investors",
+        "https://www.pymnts.com/news/investment-tracker/2025/google-ventures-backed-attio-raises-52-million-dollars-ai-native-crm-platform/",
+        "https://www.eu-startups.com/2025/08/londons-attio-raises-e44-million-to-scale-the-first-ai-native-crm-for-go-to-market-builders/",
+        "https://www.automationjinn.com/blog/attio-crm-the-complete-guide-for-startups",
+        "https://technologymagazine.com/news/attio-raises-52m-series-b",
+        "https://www.distillintelligence.com/news/attio",
+        "https://attio.com/changelog/2026",
+        "https://attio.com/blog/attio-raises-33-million-in-funding"
+      ]
+    }
+  },
+  "summary": {
+    "decision": "DEPRIORITIZE",
+    "signal_count": 3,
+    "reasoning_preview": "Headcount of 51-200 (web search) falls below the target company size of 200-2000, and revenue estimate of $3M-$8M suggests limited budget for a mid-market analytics platform despite strong funding reserves. Funding stage",
+    "evidence_sources": [
+      "company_signals",
+      "technology",
+      "hiring",
+      "web_search"
+    ],
+    "confidence": "medium"
+  },
+  "product_description": "Data warehouse and analytics platform for revenue operations teams.",
+  "analyzed_at": "2026-09-23T21:43:55.809429+00:00"
+}

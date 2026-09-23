@@ -1,0 +1,100 @@
+{
+  "company_name": "Linear",
+  "icp_profile": {
+    "target_company_size": "50-500",
+    "funding_stage": [
+      "Series A",
+      "Series B",
+      "Series C"
+    ],
+    "tech_signals": [
+      "Stripe",
+      "AWS",
+      "Slack",
+      "Notion",
+      "Brex"
+    ],
+    "hiring_signals": [
+      "CFO",
+      "Controller",
+      "Finance Manager",
+      "VP of Operations",
+      "Finance Business Partner"
+    ],
+    "budget_indicator": "mid-market",
+    "raw_description": "Spend management and corporate cards for fast-growing tech companies."
+  },
+  "verdict": {
+    "decision": "WATCH",
+    "reasoning": "Headcount of 201-500 fits the target company size range of 50-500 (company fundamentals), and Series C funding stage matches directly (company fundamentals). However, the technology summary shows Slack and Notion in use but no confirmed Stripe, AWS, or Brex (web search: tech stack is GCP-based, not AWS), and hiring activity is concentrated in Engineering, GTM, Marketing, and Compliance with no mention of CFO, Controller, Finance Manager, VP of Operations, or Finance Business Partner roles (web search: hiring signals).",
+    "signals": [
+      "Company size: 201-500 employees matches target range of 50-500 (company fundamentals)",
+      "Funding stage: Series C aligns exactly with target stages (company fundamentals)",
+      "Tech stack: partial match \u2014 Slack and Notion present, but AWS/Stripe/Brex not confirmed (web search: technology signals) \u2014 infrastructure runs on GCP instead",
+      "Hiring: no finance-function roles (CFO, Controller, Finance Manager, VP Ops) found; growth hiring is GTM/Engineering/Compliance-focused (web search: hiring signals)",
+      "Budget capacity: strong, with $100M ARR, $234M+ raised, and $2.5B valuation suggesting ample mid-market-plus budget (web search: recent news)"
+    ],
+    "color": "yellow",
+    "confidence": "medium",
+    "next_step": "Verify whether Linear has a Finance or Ops leader (e.g., check LinkedIn for a Controller, Head of Finance, or VP Finance) before prioritizing outreach \u2014 if such a hire is found or a role is open, this becomes a strong PURSUE given its size, funding stage, and budget capacity."
+  },
+  "evidence": {
+    "company_signals": {
+      "funding_stage": "Series C",
+      "total_funding": "$134M",
+      "headcount": 280,
+      "headcount_range": "201-500",
+      "founded_year": 2019,
+      "headquarters": "San Francisco, California",
+      "revenue_estimate": "$100M"
+    },
+    "technology": "Linear runs a modern, cloud-native stack built on GCP (GKE, Cloud SQL, Memorystore, Pub/Sub) with a TypeScript/React/GraphQL codebase, indicating strong engineering maturity and a fully committed Google Cloud investment. Their toolchain (Retool, Notion, Figma, Front, Slack) suggests a lean, product-and-engineering-driven organization rather than heavy sales/CRM infrastructure. This profile fits companies with sophisticated in-house engineering teams that value developer experience and infrastructure reliability\u2014key considerations for sales messaging around technical fit and integration ease.",
+    "hiring": "Linear is actively hiring across Engineering, Marketing, Developer Relations, GTM, and Compliance, signaling broad organizational growth rather than a single-function push. Notably, the addition of a GTM Lead and Compliance & Trust Lead suggests the company is scaling its go-to-market motion and preparing for enterprise-grade trust/compliance requirements (e.g., SOC 2, security reviews). The AI-focused product engineering role also indicates continued investment in AI capabilities, positioning Linear for expanded platform scope and larger deal sizes.",
+    "web_search": "Linear is a well-funded, capital-efficient SaaS company (Series C, $1.25B valuation, $134M raised) that reached $100M ARR by mid-2026 while remaining cashflow positive since 2021\u2014signaling strong product-market fit and financial stability without heavy VC dependency. With 120-280 employees, a 40,000+ paying customer base, 177% net revenue retention, and enterprise logos like Salesforce and Figma, Linear shows strong upmarket momentum and expansion potential. The mismatch between headcount and revenue/customer scale suggests high efficiency per employee, making it a lean but high-value target with likely strong budget authority concentrated in a small team.\n\nLinear is scaling fast\u201440,000+ customers, $100M ARR, 177% NRR, and a jump to $2.5B valuation ($234M+ raised)\u2014signaling strong momentum and budget for enterprise-grade tooling. Its push into AI-agent-native features (Triage Intelligence, Codex/Cursor integrations, Salesforce/Intercom/Zendesk/Gong connectors) shows active investment in extending product-led workflows across support, sales, and engineering, making it a strong target for AI/DevOps/enterprise integration vendors. Leadership additions (COO from Stripe) and elite customer base (OpenAI, Vercel, Ramp, Cursor) further indicate enterprise readiness and appetite for high-value partnerships.",
+    "source_errors": {},
+    "source_urls": {
+      "technology": [
+        "https://rocketreach.co/linear-technology-stack_b40626b8fc2d513f",
+        "https://performance.dev/how-is-linear-so-fast-a-technical-breakdown",
+        "https://marknotfound.com/posts/reverse-engineering-linears-sync-magic/",
+        "https://cloud.google.com/blog/products/databases/product-workflow-tool-linear-uses-google-cloud-databases",
+        "https://linear.app/careers/cd5ae036-0223-427a-b038-ba16ef9dcb32",
+        "https://stackshare.io/linear/linear"
+      ],
+      "hiring": [
+        "https://linear.app/careers/cd5ae036-0223-427a-b038-ba16ef9dcb32",
+        "https://linear.app/careers/b4a7764e-c680-4bdf-9956-dc78f2ca94d5",
+        "https://linear.app/careers/62a4524c-75da-499e-b150-7f68ce9f2da3",
+        "https://jobs.ashbyhq.com/Linear"
+      ],
+      "web_search": [
+        "https://websets.exa.ai/websets/directory/linear-funding",
+        "https://getlatka.com/companies/linear.app",
+        "https://tracxn.com/d/companies/linear/__xC97n-jdX7VZjDBpNyRfVH-H_Elzu354nD5Yz5FaUVI",
+        "https://sacra.com/c/linear/",
+        "https://pitchbook.com/profiles/company/343139-23",
+        "https://linear.app/now/building-our-way",
+        "https://techcrunch.com/2025/06/10/atlassian-rival-linear-raises-82m-at-1-25b-valuation/",
+        "https://linear.app/now/news",
+        "https://spyingbee.com/updates/linear/2025",
+        "https://linear.app/now/product-launches",
+        "https://www.distillintelligence.com/news/linear",
+        "https://www.enterprisetech30.com/list/linear"
+      ]
+    }
+  },
+  "summary": {
+    "decision": "WATCH",
+    "signal_count": 5,
+    "reasoning_preview": "Headcount of 201-500 fits the target company size range of 50-500 (company fundamentals), and Series C funding stage matches directly (company fundamentals). However, the technology summary shows Slack and Notion in use ",
+    "evidence_sources": [
+      "company_signals",
+      "technology",
+      "hiring",
+      "web_search"
+    ],
+    "confidence": "medium"
+  },
+  "product_description": "Spend management and corporate cards for fast-growing tech companies.",
+  "analyzed_at": "2026-09-23T21:43:20.180008+00:00"
+}
