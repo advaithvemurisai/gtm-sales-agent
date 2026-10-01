@@ -1,21 +1,12 @@
 import React from 'react';
 
-const paragraphStyle = {
-  fontSize: 14,
-  color: 'var(--color-text-secondary)',
-  lineHeight: 1.75,
-  margin: 0,
-};
-
 function renderInline(text) {
   const parts = String(text || '').split(/(\*\*[^*]+\*\*)/g);
 
   return parts.map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) {
       return (
-        <strong key={index} style={{ color: 'var(--color-text-primary)', fontWeight: 650 }}>
-          {part.slice(2, -2)}
-        </strong>
+        <strong key={index}>{part.slice(2, -2)}</strong>
       );
     }
 
@@ -30,6 +21,8 @@ export function InlineFormattedText({ text }) {
 function splitBlocks(text) {
   return String(text || '')
     .replace(/\r\n/g, '\n')
+    // Raw search text can carry markdown headings; render them as the bold heading blocks below.
+    .replace(/^#{1,6}\s+(.+)$/gm, '\n\n**$1**\n\n')
     .split(/\n{2,}/)
     .map((block) => block.trim())
     .filter(Boolean);
@@ -52,60 +45,26 @@ function getBulletItems(block) {
   return lines.map((line) => line.replace(/^[-*]\s+/, '').trim()).filter(Boolean);
 }
 
-function FormattedText({ text, accentColor = 'var(--color-text-success)' }) {
+function FormattedText({ text }) {
   const blocks = splitBlocks(text);
-
-  if (!blocks.length) {
-    return null;
-  }
+  if (!blocks.length) return null;
 
   return (
-    <div style={{ display: 'grid', gap: 14 }}>
+    <div className="prose">
       {blocks.map((block, index) => {
+        if (isHeading(block)) return <p key={index} className="prose-heading">{cleanHeading(block)}</p>;
+
         const bulletItems = getBulletItems(block);
-
-        if (isHeading(block)) {
-          return (
-            <p
-              key={index}
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: 'var(--color-text-primary)',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                margin: 0,
-              }}
-            >
-              {cleanHeading(block)}
-            </p>
-          );
-        }
-
         if (bulletItems) {
           return (
-            <div key={index} style={{ display: 'grid', gap: 10 }}>
-              {bulletItems.map((item, itemIndex) => (
-                <div key={itemIndex} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <span
-                    style={{
-                      width: 7,
-                      height: 7,
-                      borderRadius: '50%',
-                      background: accentColor,
-                      marginTop: 9,
-                      flexShrink: 0,
-                    }}
-                  />
-                  <p style={paragraphStyle}>{renderInline(item)}</p>
-                </div>
-              ))}
-            </div>
+            <ul key={index} className="prose-list">
+              {bulletItems.map((item, itemIndex) => <li key={itemIndex}>{renderInline(item)}</li>)}
+            </ul>
           );
         }
 
         return (
-          <p key={index} style={paragraphStyle}>
+          <p key={index}>
             {block.split('\n').map((line, lineIndex) => (
               <React.Fragment key={lineIndex}>
                 {lineIndex > 0 && <br />}

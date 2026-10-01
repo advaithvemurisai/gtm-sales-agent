@@ -2,15 +2,22 @@ import React, { useEffect, useRef, useState } from 'react';
 import InputPanel from './components/InputPanel';
 import VerdictCard from './components/VerdictCard';
 import EvidencePanel from './components/EvidencePanel';
+import FeedbackBar from './components/FeedbackBar';
+import SourceLedger from './components/SourceLedger';
+import Stages, { STAGES } from './components/Stages';
 import IcpProfile, { LIST_FIELDS } from './components/IcpProfile';
 import './App.css';
 
+export const BRAND = 'Fitcheck';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 // Versioned so results saved under an older response shape are never read back.
 const PRODUCT_KEY = 'gtm-agent:v2:product-description';
 const COMPANY_KEY = 'gtm-agent:v2:company-name';
 const WEBSITE_KEY = 'gtm-agent:v2:company-website';
 const HISTORY_KEY = 'gtm-agent:v2:history';
+const ICP_STORE_KEY = 'gtm-agent:v2:icp-by-product';
+const ICP_FIELDS = ['target_company_size', 'funding_stage', 'tech_signals', 'hiring_signals', 'budget_indicator'];
+const FEEDBACK_KEY = 'gtm-agent:v2:feedback';
 const HISTORY_LIMIT = 8;
 const ICP_ITEM_MAX_LENGTH = 80;
 const ICP_LIST_LIMITS = { funding_stage: 8, tech_signals: 10, hiring_signals: 10 };
@@ -34,16 +41,49 @@ const storage = {
   },
 };
 
+// The ICP is a property of the product, not the account. Reusing it keeps verdicts comparable across companies.
+function productHash(description) {
+  let hash = 5381;
+  for (const char of description.trim().toLowerCase()) hash = ((hash * 33) ^ char.charCodeAt(0)) >>> 0;
+  return String(hash);
+}
+
+function pickIcp(profile) {
+  const icp = Object.fromEntries(ICP_FIELDS.map((key) => [key, profile?.[key] ?? (LIST_FIELDS.includes(key) ? [] : null)]));
+  return ICP_FIELDS.some((key) => (Array.isArray(icp[key]) ? icp[key].length : icp[key])) ? icp : null;
+}
+
+const resultKey = (result) => `${result?.company_name}|${result?.icp_profile?.raw_description || ''}`;
+const historyKey = (item) => `${item.company_name}|${item.result?.icp_profile?.raw_description || ''}`;
+
 function loadHistory() {
   const saved = storage.get(HISTORY_KEY, []);
   return Array.isArray(saved) ? saved.filter((item) => item?.result?.verdict && item?.result?.icp_profile) : [];
 }
 
-function loadingMessage(seconds) {
-  if (seconds < 5) return 'Reading what you sell and building the ideal customer profile...';
-  if (seconds < 35) return 'Searching the web for company, technology, and hiring signals...';
-  if (seconds < 60) return 'Summarizing the evidence against your ideal customer profile...';
-  return 'Writing the verdict. Slower searches can take up to two minutes...';
+
+// Reads the /analyze/stream server-sent events: `stage` updates, then one `result` or `error`.
+async function readAnalysisStream(response, onStage) {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const frames = buffer.split('\n\n');
+    buffer = frames.pop();
+    for (const frame of frames) {
+      const event = /^event: (.+)$/m.exec(frame)?.[1];
+      const data = /^data: (.+)$/m.exec(frame)?.[1];
+      if (!event || !data) continue;
+      const payload = JSON.parse(data);
+      if (event === 'stage') onStage(payload.stage);
+      else if (event === 'result') return payload;
+      else if (event === 'error') throw requestError(payload.detail, payload.code);
+    }
+  }
+  throw requestError('The analysis ended before a result arrived. Please try again.', 'server');
 }
 
 const NETWORK_ERROR = "Couldn't reach the server. It may be starting up; try again in a minute.";
@@ -98,6 +138,7 @@ function App() {
   const [companyWebsite, setCompanyWebsite] = useState(() => storage.get(WEBSITE_KEY, ''));
   const [productDescription, setProductDescription] = useState(() => storage.get(PRODUCT_KEY, ''));
   const [history, setHistory] = useState(loadHistory);
+  const [feedback, setFeedback] = useState(() => storage.get(FEEDBACK_KEY, {}));
   const [icpDraft, setIcpDraft] = useState(null);
   const [icpError, setIcpError] = useState(null);
   const [copyStatus, setCopyStatus] = useState('');
@@ -115,12 +156,16 @@ function App() {
     analyzed_at: new Date(example.analyzed_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }),
   }));
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [stage, setStage] = useState('research');
+  const [seenStages, setSeenStages] = useState([]);
+  const [hotSourceId, setHotSourceId] = useState(null);
   const [pendingSection, setPendingSection] = useState(null);
 
   useEffect(() => { storage.set(PRODUCT_KEY, productDescription); }, [productDescription]);
   useEffect(() => { storage.set(COMPANY_KEY, companyName); }, [companyName]);
   useEffect(() => { storage.set(WEBSITE_KEY, companyWebsite); }, [companyWebsite]);
   useEffect(() => { storage.set(HISTORY_KEY, history); }, [history]);
+  useEffect(() => { storage.set(FEEDBACK_KEY, feedback); }, [feedback]);
 
   useEffect(() => {
     if (healthStarted.current) return;
@@ -185,15 +230,20 @@ function App() {
 
   const handleAnalyze = async (data, icpProfile = null) => {
     setLoading(true);
+    const firstStage = icpProfile ? 'research' : 'icp';
+    setStage(firstStage);
+    setSeenStages([firstStage]);
     setError(null);
     setCompanyName(data.company_name);
     setProductDescription(data.product_description);
     setCompanyWebsite(data.company_website || '');
+    const savedIcp = icpProfile || storage.get(ICP_STORE_KEY, {})[productHash(data.product_description)] || null;
+    icpProfile = savedIcp;
     setLastRequest({ ...data, icp_profile: icpProfile });
 
     try {
       // Only a failed fetch means the server was unreachable; other errors keep their own message.
-      const response = await fetch(`${API_BASE_URL}/analyze`, {
+      const post = (path) => fetch(`${API_BASE_URL}${path}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -201,16 +251,29 @@ function App() {
         body: JSON.stringify({ ...data, icp_profile: icpProfile }),
       }).catch(() => { throw requestError(NETWORK_ERROR, 'network'); });
 
+      let response = await post('/analyze/stream');
+      // A backend deployed before streaming existed has only /analyze; fall back without stage updates.
+      const streaming = response.status !== 404;
+      if (!streaming) response = await post('/analyze');
+
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
         throw requestError(errorMessage(payload), payload?.code || 'server');
       }
 
-      const result = await response.json();
+      const result = streaming
+        ? await readAnalysisStream(response, (next) => {
+          setStage(next);
+          setSeenStages((seen) => [...seen, next]);
+        })
+        : await response.json();
       showResult(result);
+      const learned = pickIcp(result.icp_profile);
+      if (learned) storage.set(ICP_STORE_KEY, { ...storage.get(ICP_STORE_KEY, {}), [productHash(data.product_description)]: learned });
+      const entry = { company_name: result.company_name, decision: result.verdict.decision, analyzed_at: new Date().toISOString(), result };
       setHistory((current) => [
-        { company_name: result.company_name, decision: result.verdict.decision, analyzed_at: new Date().toISOString(), result },
-        ...current.filter((item) => item.company_name !== result.company_name),
+        entry,
+        ...current.filter((item) => historyKey(item) !== historyKey(entry)),
       ].slice(0, HISTORY_LIMIT));
     } catch (err) {
       setError({ message: err.code ? err.message : 'Something went wrong showing the result. Please try again.', code: err.code || 'client' });
@@ -244,7 +307,7 @@ function App() {
     const lines = [
       `${companyData.company_name}: ${verdict.decision} (confidence: ${verdict.confidence})`,
       verdict.reasoning,
-      ...(verdict.signals || []).map((signal) => `- ${signal}`),
+      ...(verdict.signals || []).map((signal) => `- ${signal.text ?? signal}`),
       verdict.next_step && `Next step: ${verdict.next_step}`,
     ].filter(Boolean);
     try {
@@ -273,8 +336,8 @@ function App() {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <a className="brand" href="/" onClick={navigate('top')}>GTM Agent</a>
-        <nav><a href="#how-it-works" onClick={navigate('how-it-works')}>How it works</a><a href="#example" onClick={navigate('example')}>Example</a></nav>
+        <a className="brand" href="/" onClick={navigate('top')}><span className="brand-mark" aria-hidden="true"><i className="ti ti-check" /></span>{BRAND}</a>
+        <nav><a href="#example" onClick={navigate('example')}>Examples</a><a href="#how-it-works" onClick={navigate('how-it-works')}>Method</a></nav>
       </header>
       {error && (
         <div className={`notice ${error.code === 'demo_paused' ? 'notice-paused' : 'notice-error'}`} role="alert">
@@ -285,13 +348,10 @@ function App() {
       )}
 
       {loading && (
-        <div role="status" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '70vh', flexDirection: 'column', gap: 16, padding: '0 1rem' }}>
-          <div className="animate-spin" style={{ width: 32, height: 32, border: '2px solid var(--color-border-primary)', borderTopColor: 'var(--color-text-success)', borderRadius: '50%' }} />
-          <p style={{ color: 'var(--color-text-primary)', fontSize: 15, textAlign: 'center', maxWidth: 420, margin: 0 }}>Researching {companyName}</p>
-          <p style={{ color: 'var(--color-text-secondary)', fontSize: 13, textAlign: 'center', maxWidth: 380, margin: 0 }}>
-            {loadingMessage(elapsedSeconds)}
-          </p>
-          <p className="muted-text">{elapsedSeconds}s elapsed · usually 30–90 seconds</p>
+        <div role="status" aria-live="polite" className="loading">
+          <h1 className="loading-title">Checking {companyName}<span>…</span></h1>
+          <Stages vertical active={stage} skipped={STAGES.slice(0, STAGES.findIndex(({ id }) => id === stage)).map(({ id }) => id).filter((id) => !seenStages.includes(id))} />
+          <p className="elapsed">{String(Math.floor(elapsedSeconds / 60)).padStart(2, '0')}:{String(elapsedSeconds % 60).padStart(2, '0')} elapsed · usually 20–60s</p>
         </div>
       )}
 
@@ -316,34 +376,41 @@ function App() {
       )}
 
       {!loading && phase === 'result' && companyData && (
-        <div style={{ maxWidth: 760, margin: '0 auto', padding: '2rem 1rem' }}>
-          {companyData.saved_example && (
-            <p className="saved-banner">
-              Saved example · analyzed {companyData.analyzed_at} · selling &ldquo;{companyData.product_description?.replace(/\.$/, '')}&rdquo;{' '}·{' '}
-              <button type="button" onClick={handleStartOver}>Research your own account</button>
-            </p>
-          )}
-          <VerdictCard verdict={companyData.verdict} company={companyData.company_name} />
-          <div className="result-actions">
-            <button className="secondary-button" type="button" onClick={handleCopy}>Copy summary</button>
-            <span className="muted-text" role="status" aria-live="polite">{copyStatus}</span>
-          </div>
-          <IcpProfile
-            profile={companyData.icp_profile}
-            draft={icpDraft}
-            error={icpError}
-            onEdit={() => { setIcpDraft(draftFromProfile(companyData.icp_profile)); setIcpError(null); }}
-            onChange={(key, value) => setIcpDraft((current) => ({ ...current, [key]: value }))}
-            onCancel={() => { setIcpDraft(null); setIcpError(null); }}
-            onRerun={rerunWithIcp}
-          />
-          <EvidencePanel evidence={companyData.evidence} />
-          <button
-            onClick={handleStartOver}
-            style={{ width: '100%', marginTop: '1.5rem', padding: '13px', borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border-secondary)', background: 'var(--color-background-secondary)', color: 'var(--color-text-secondary)', fontSize: 14, cursor: 'pointer' }}
-          >
-            Analyze another company
-          </button>
+        <div className="dossier">
+          <main className="dossier-main">
+            {companyData.saved_example && (
+              <p className="saved-banner">
+                <span className="mono">saved example · {companyData.analyzed_at}</span>
+                <span>Selling &ldquo;{companyData.product_description?.replace(/\.$/, '')}&rdquo;</span>
+                <button type="button" className="link-button" onClick={handleStartOver}>Check your own account</button>
+              </p>
+            )}
+            <VerdictCard verdict={companyData.verdict} company={companyData.company_name} sources={companyData.evidence?.sources}
+              hotId={hotSourceId} onHover={setHotSourceId} />
+            <div className="toolbar">
+              <button className="btn" type="button" onClick={handleCopy}><i className="ti ti-copy" aria-hidden="true" />Copy summary</button>
+              <span className="status-text" role="status" aria-live="polite">{copyStatus}</span>
+              <span className="toolbar-spacer" />
+              {!companyData.saved_example && (
+                <FeedbackBar key={resultKey(companyData)} feedback={feedback[resultKey(companyData)]}
+                  onChange={(value) => setFeedback((current) => ({ ...current, [resultKey(companyData)]: { ...value, decision: companyData.verdict.decision, at: new Date().toISOString() } }))} />
+              )}
+            </div>
+            <IcpProfile
+              profile={companyData.icp_profile}
+              draft={icpDraft}
+              error={icpError}
+              onEdit={() => { setIcpDraft(draftFromProfile(companyData.icp_profile)); setIcpError(null); }}
+              onChange={(key, value) => setIcpDraft((current) => ({ ...current, [key]: value }))}
+              onCancel={() => { setIcpDraft(null); setIcpError(null); }}
+              onRerun={rerunWithIcp}
+            />
+            <EvidencePanel evidence={companyData.evidence} />
+            <button type="button" className="btn new-account" onClick={handleStartOver}><i className="ti ti-arrow-left" aria-hidden="true" />Check another account</button>
+          </main>
+          <aside className="dossier-aside">
+            <SourceLedger sources={companyData.evidence?.sources} hotId={hotSourceId} onHover={setHotSourceId} />
+          </aside>
         </div>
       )}
     </div>

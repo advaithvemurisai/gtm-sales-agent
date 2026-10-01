@@ -1,10 +1,10 @@
-# GTM Agent
+# Fitcheck
 
-**Should your sales team go after this account?** Enter what you sell and a target company. GTM Agent researches the company on the public web and returns a **Pursue / Watch / Deprioritize** verdict with a confidence level, the evidence behind it, and a recommended next step.
+**Should your sales team go after this account?** Enter what you sell and a target company. Fitcheck researches the company on the public web and returns a **Pursue / Watch / Deprioritize** verdict with a confidence level, the evidence behind it, and a recommended next step.
 
 **Live demo:** [gtm-sales-agent.vercel.app](https://gtm-sales-agent.vercel.app)
 
-![A saved example: a Watch verdict for Linear with medium confidence, a recommended next step, key signals, and the ideal customer profile used](frontend/public/result.png)
+![A saved example: a Deprioritize verdict for Linear with medium confidence, a fit score of 2 of 5 criteria, a criteria scorecard with cited sources, and the numbered source ledger](frontend/public/result.png)
 
 ## What you get
 
@@ -16,7 +16,7 @@
 
 ## How it works
 
-1. **Describe what you sell.** GTM Agent turns it into clear buying criteria.
+1. **Describe what you sell.** Fitcheck turns it into clear buying criteria.
 2. **It researches the company** across the public web: company facts, technology, hiring, and recent news.
 3. **It weighs the evidence against your criteria** and explains its verdict.
 
@@ -25,7 +25,11 @@ Built with React, FastAPI, and Claude. A typical analysis takes under a minute.
 ## Engineering highlights
 
 - **Measured decisions.** Search approaches were benchmarked on real queries before choosing one, which cut a full analysis from about two minutes to under one.
-- **Fails gracefully.** A slow or failed source is reported as missing instead of breaking the verdict.
+- **Fails gracefully.** A slow or failed source is reported as missing instead of breaking the verdict, and a failed extraction is never mistaken for negative evidence.
+- **Checked confidence.** The model's confidence is capped in code by how many sources failed and how many ICP criteria have no evidence behind them.
+- **Cited claims.** Every signal and criterion carries numbered source links, and the verdict card shows a criteria match table.
+- **Structured outputs.** Verdict and extractors use JSON-schema outputs, so there is no regex parsing of model text.
+- **Cheap reruns.** Evidence is cached for six hours per company, so re-running with edited criteria only regenerates the verdict (1 LLM call and about 7s, vs. 8 calls and about 20s fresh).
 - **Validated input** for everything a user can edit, and **tested** parsing, validation, and error handling.
 
 ## Run locally
@@ -39,6 +43,12 @@ cd frontend && npm install && npm run dev
 ```
 
 Open http://localhost:3000. Run the tests with `pytest`.
+
+**Deploying behind a proxy.** Set `TRUSTED_PROXY_HOPS` to the number of reverse proxies in front of the API (for example `1` on most hosts) so the per-client rate limit keys on the real client IP from `X-Forwarded-For` instead of the proxy's address. Leave it unset when the API is exposed directly. Workspace-scoped API keys (`sk-ant-api03-…`) need nothing extra; a user-scoped key (`sk-ant-usr-…`) also needs `ANTHROPIC_WORKSPACE_ID`, sent as the `anthropic-workspace-id` header. Model IDs are overridable with `ANTHROPIC_SONNET_MODEL` and `ANTHROPIC_HAIKU_MODEL`.
+
+## Evaluating verdict quality
+
+`python scripts/eval_verdicts.py` runs 15 labeled cases (`scripts/eval_cases.json`: three seller products against five companies each, with the set of defensible verdicts for each) and reports agreement with the expected set, decision stability across repeat runs, citation coverage, p50/p95 latency, and token cost per run from the telemetry logs. The expected sets are the author's judgement, not ground truth. It makes paid API calls (about $0.20 per fresh run) and writes `scripts/eval_results.json`.
 
 ## Limitations
 
