@@ -336,7 +336,7 @@ function App() {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <a className="brand" href="/" onClick={navigate('top')}><span className="brand-mark" aria-hidden="true"><i className="ti ti-check" /></span>{BRAND}</a>
+        <a className="brand" href="/" onClick={navigate('top')}><svg className="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" /><path d="M10.5 21.5L21 11M13 10.5h8.5V19" /></svg>{BRAND}</a>
         <nav><a href="#example" onClick={navigate('example')}>Examples</a><a href="#how-it-works" onClick={navigate('how-it-works')}>Method</a></nav>
       </header>
       {error && (
