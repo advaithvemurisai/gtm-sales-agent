@@ -1,6 +1,6 @@
-# Fitcheck
+# Pursue
 
-**Should your sales team go after this account?** Enter what you sell and a target company. Fitcheck researches the company on the public web and returns a **Pursue / Watch / Deprioritize** verdict with a confidence level, the evidence behind it, and a recommended next step.
+**Should your sales team go after this account?** Enter what you sell and a target company. It researches the company on the public web and tells you whether to **pursue, watch, or deprioritize** it, with a confidence level, the evidence behind it, and a recommended next step.
 
 **Live demo:** [gtm-sales-agent.vercel.app](https://gtm-sales-agent.vercel.app)
 
@@ -16,7 +16,7 @@
 
 ## How it works
 
-1. **Describe what you sell.** Fitcheck turns it into clear buying criteria.
+1. **Describe what you sell.** Pursue turns it into clear buying criteria.
 2. **It researches the company** across the public web: company facts, technology, hiring, and recent news.
 3. **It weighs the evidence against your criteria** and explains its verdict.
 

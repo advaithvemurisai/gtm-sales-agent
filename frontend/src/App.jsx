@@ -8,7 +8,7 @@ import Stages, { STAGES } from './components/Stages';
 import IcpProfile, { LIST_FIELDS } from './components/IcpProfile';
 import './App.css';
 
-export const BRAND = 'Fitcheck';
+export const BRAND = 'Pursue';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 // Versioned so results saved under an older response shape are never read back.
 const PRODUCT_KEY = 'gtm-agent:v2:product-description';
