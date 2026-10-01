@@ -10,24 +10,16 @@ def set_env_vars(monkeypatch):
 
 
 def test_run_evaluation_pipeline_and_format_verdict(monkeypatch):
+    from backend.agent import evidence_cache
+    evidence_cache.clear()
     """Run the pipeline with mocked backend tools and a mocked LLM client."""
-    summary_text = 'This company has a stable tech stack and moderate signals.'
-    verdict_text = (
-        'VERDICT: DEPRIORITIZE\n'
-        'REASONING: Funding stage and hiring activity are not aligned with the target ICP. Some signals indicate a smaller, cost-conscious business.\n'
-        'KEY SIGNALS:\n'
-        '- Funding stage mismatch (web search / fundamentals)\n'
-        '- No strong hiring signals for ICP roles\n'
-        '- Technology signals show legacy ERP and low cloud adoption\n'
-    )
-
     monkeypatch.setattr('backend.agent.pipeline.get_tech_signals', lambda company_name, company_website=None: {
-        'raw_data': {'company_name': company_name, 'technologies': ['ERP']},
+        'raw_data': {'company_name': company_name, 'technologies': {'other': ['ERP']}},
         'summary': 'Technology summary placeholder.',
     })
 
     monkeypatch.setattr('backend.agent.pipeline.get_hiring_signals', lambda company_name, company_website=None: {
-        'raw_data': {'company_name': company_name, 'roles': ['Operations']},
+        'raw_data': {'company_name': company_name, 'open_positions': ['Operations']},
         'summary': 'Hiring summary placeholder.',
     })
 
@@ -46,16 +38,15 @@ def test_run_evaluation_pipeline_and_format_verdict(monkeypatch):
         'summary': 'Web search summary placeholder.',
     })
 
-    monkeypatch.setattr('backend.agent.pipeline._summarize_tool_result', lambda result, tool_name, system_prompt: summary_text)
     monkeypatch.setattr('backend.agent.pipeline._generate_verdict', lambda *args, **kwargs: {
-        'raw_text': verdict_text,
         'decision': 'DEPRIORITIZE',
+        'confidence': 'high',
         'reasoning': 'Funding stage and hiring activity are not aligned with the target ICP. Some signals indicate a smaller, cost-conscious business.',
         'signals': [
-            'Funding stage mismatch (web search / fundamentals)',
-            'No strong hiring signals for ICP roles',
-            'Technology signals show legacy ERP and low cloud adoption',
+            {'text': 'Funding stage mismatch (web search / fundamentals)', 'source_ids': []},
+            {'text': 'No strong hiring signals for ICP roles', 'source_ids': []},
         ],
+        'criteria': [],
     })
 
     result = run_evaluation_pipeline(
@@ -72,10 +63,8 @@ def test_run_evaluation_pipeline_and_format_verdict(monkeypatch):
 
     assert result['company_name'] == 'Test Company'
     assert result['verdict']['decision'] == 'DEPRIORITIZE'
-    assert result['technology']['summary'] == summary_text
-    assert result['hiring']['summary'] == summary_text
-    assert result['web_search']['summary'] == f"{summary_text}\n\n{summary_text}"
+    assert result['verdict']['confidence'] == 'high'
 
     formatted = format_verdict_display(result['verdict'])
     assert formatted['decision'] == 'DEPRIORITIZE'
-    assert formatted['signals'][0] == 'Funding stage mismatch (web search / fundamentals)'
+    assert formatted['signals'][0]['text'] == 'Funding stage mismatch (web search / fundamentals)'

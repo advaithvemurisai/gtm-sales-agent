@@ -1,0 +1,25 @@
+{
+  "note": "Expected decision sets are the author's judgement of a defensible verdict, not ground truth. A verdict agrees if it falls inside the set.",
+  "products": {
+    "spend": "Spend management and corporate cards for fast-growing tech companies.",
+    "compliance": "Security compliance automation (SOC 2, ISO 27001) for scaling SaaS companies.",
+    "devtools": "Developer productivity and CI tooling for engineering teams of 20-500 people."
+  },
+  "cases": [
+    {"company": "Linear", "website": "linear.app", "product": "spend", "expected": ["PURSUE", "WATCH"]},
+    {"company": "Attio", "website": "attio.com", "product": "spend", "expected": ["PURSUE", "WATCH"]},
+    {"company": "Ramp", "website": "ramp.com", "product": "spend", "expected": ["DEPRIORITIZE"]},
+    {"company": "Stripe", "website": "stripe.com", "product": "spend", "expected": ["DEPRIORITIZE", "WATCH"]},
+    {"company": "Walmart", "website": "walmart.com", "product": "spend", "expected": ["DEPRIORITIZE"]},
+    {"company": "Supabase", "website": "supabase.com", "product": "compliance", "expected": ["PURSUE", "WATCH"]},
+    {"company": "Linear", "website": "linear.app", "product": "compliance", "expected": ["PURSUE", "WATCH"]},
+    {"company": "Vanta", "website": "vanta.com", "product": "compliance", "expected": ["DEPRIORITIZE"]},
+    {"company": "Notion", "website": "notion.so", "product": "compliance", "expected": ["WATCH", "DEPRIORITIZE"]},
+    {"company": "Google", "website": "google.com", "product": "compliance", "expected": ["DEPRIORITIZE"]},
+    {"company": "Retool", "website": "retool.com", "product": "devtools", "expected": ["PURSUE", "WATCH"]},
+    {"company": "Linear", "website": "linear.app", "product": "devtools", "expected": ["PURSUE", "WATCH"]},
+    {"company": "Vercel", "website": "vercel.com", "product": "devtools", "expected": ["PURSUE", "WATCH"]},
+    {"company": "Microsoft", "website": "microsoft.com", "product": "devtools", "expected": ["DEPRIORITIZE"]},
+    {"company": "Shopify", "website": "shopify.com", "product": "devtools", "expected": ["DEPRIORITIZE", "WATCH"]}
+  ]
+}

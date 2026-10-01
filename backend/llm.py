@@ -14,10 +14,13 @@ _MAX_SEARCH_CONTINUATIONS = 3
 
 
 def get_client() -> Anthropic:
+    # User-scoped keys (sk-ant-usr-...) aren't tied to a workspace, so the API needs it named.
+    workspace_id = os.getenv("ANTHROPIC_WORKSPACE_ID")
     return Anthropic(
         api_key=os.getenv("ANTHROPIC_API_KEY"),
         timeout=REQUEST_TIMEOUT_SECONDS,
         max_retries=MAX_RETRIES,
+        default_headers={"anthropic-workspace-id": workspace_id} if workspace_id else None,
     )
 
 
@@ -39,6 +42,42 @@ def parse_json_object(text: str) -> dict:
     """Parse a JSON object from model output that may be wrapped in code fences."""
     cleaned = text.replace("```json", "").replace("```", "").strip()
     return json.loads(cleaned)
+
+
+def generate_json(
+    client: Anthropic,
+    *,
+    model: str,
+    prompt: str,
+    schema: dict,
+    operation: str,
+    logger: logging.Logger,
+    system: str | None = None,
+    max_tokens: int = 1024,
+    effort: str | None = None,
+) -> dict:
+    """Call the model with a JSON-schema output format and return the parsed object.
+
+    The schema is enforced by the API (structured outputs), so there is no fence stripping or
+    best-effort parsing. Raises if the model refuses, is cut off, or returns invalid JSON, so callers
+    can report the source as failed instead of treating a bad parse as real evidence.
+    """
+    output_config: dict = {"format": {"type": "json_schema", "schema": schema}}
+    if effort:
+        output_config["effort"] = effort
+    kwargs: dict = {"system": system} if system else {}
+    started_at = time.perf_counter()
+    response = client.messages.create(
+        model=model,
+        max_tokens=max_tokens,
+        output_config=output_config,
+        messages=[{"role": "user", "content": prompt}],
+        **kwargs,
+    )
+    log_anthropic_usage(logger, operation=operation, model=model, started_at=started_at, response=response)
+    if getattr(response, "stop_reason", None) in ("refusal", "max_tokens"):
+        raise ValueError(f"{operation} returned no usable output (stop_reason={response.stop_reason})")
+    return parse_json_object(response_text(response))
 
 
 def run_web_search(client: Anthropic, query: str, logger: logging.Logger, operation: str) -> tuple[str, list[str]]:

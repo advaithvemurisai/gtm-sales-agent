@@ -1,7 +1,7 @@
 import os
 
 
-SONNET_MODEL = os.getenv("ANTHROPIC_SONNET_MODEL", "claude-sonnet-5")
+SONNET_MODEL = os.getenv("ANTHROPIC_SONNET_MODEL", "claude-sonnet-5-5")
 HAIKU_MODEL = os.getenv("ANTHROPIC_HAIKU_MODEL", "claude-haiku-4-5")
 # The basic search tool, not web_search_20260209: on this app's queries it measured ~21s per search
 # vs 34s-to-timeout for the dynamic-filtering variant, with ~5x fewer input tokens and fuller answers.
@@ -13,3 +13,4 @@ MAX_RETRIES = 1
 SEARCH_TIMEOUT_SECONDS = 90
 MAX_COMPANY_NAME_LENGTH = 120
 MAX_PRODUCT_DESCRIPTION_LENGTH = 2000
+MAX_EVIDENCE_CHARS = 3500  # per source, when raw search text goes into the verdict prompt

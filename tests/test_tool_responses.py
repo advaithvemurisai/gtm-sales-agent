@@ -1,7 +1,11 @@
+import json
 from types import SimpleNamespace
 
-from backend.agent.pipeline import _summarize_tool_result, run_evaluation_pipeline
-from backend.llm import response_text, run_web_search
+import pytest
+
+from backend.agent import evidence_cache
+from backend.agent.pipeline import run_evaluation_pipeline
+from backend.llm import generate_json, response_text, run_web_search
 from backend.tools import hiring_signals, tech_signals, web_search
 
 
@@ -34,6 +38,7 @@ def message(*blocks, stop_reason="end_turn"):
 def test_tools_accept_text_blocks_without_citations(monkeypatch):
     search_response = message(text_block("Search result", None))
     json_response = message(text_block("{}"))
+    monkeypatch.setattr(web_search, "parse_company_signals", lambda *args: {})
 
     monkeypatch.setattr(web_search, "get_client", lambda: QueueClient([
         search_response,
@@ -85,41 +90,123 @@ def test_response_text_skips_thinking_blocks():
     assert response_text(response) == "Answer"
 
 
-def test_pipeline_handles_string_search_results_and_parent_failure(monkeypatch):
-    assert "SOURCE FAILED" in _summarize_tool_result(
-        {"raw_data": "fundamentals text", "error": "search unavailable"},
-        "Company Fundamentals",
-        "system",
-    )
+def _stub_sources(monkeypatch, calls=None, web_error=None):
+    def count(name, result):
+        def fn(company, website=None):
+            if calls is not None:
+                calls.append(name)
+            return result
+        return fn
 
-    monkeypatch.setattr("backend.agent.pipeline.get_tech_signals", lambda name, website=None: {
-        "raw_data": {"technologies": {}, "error": None}, "summary": None,
-    })
-    monkeypatch.setattr("backend.agent.pipeline.get_hiring_signals", lambda name, website=None: {
-        "raw_data": {"open_positions": [], "error": None}, "summary": None,
-    })
-    monkeypatch.setattr("backend.agent.pipeline.get_web_search_data", lambda name, website=None: {
+    monkeypatch.setattr("backend.agent.pipeline.get_tech_signals", count("tech", {
+        "raw_data": {"technologies": {}, "source_urls": ["https://a.example/stack"], "error": None}, "summary": None,
+    }))
+    monkeypatch.setattr("backend.agent.pipeline.get_hiring_signals", count("hiring", {
+        "raw_data": {"open_positions": [], "source_urls": [], "error": None}, "summary": None,
+    }))
+    monkeypatch.setattr("backend.agent.pipeline.get_web_search_data", count("web", {
         "raw_data": {
-            "fundamentals": "fundamentals text",
-            "news": "news text",
-            "company_signals": {},
-            "error": "web search unavailable",
+            "fundamentals": "fundamentals text", "news": "news text", "company_signals": {},
+            "source_urls": ["https://b.example/about"], "error": web_error,
         },
         "summary": None,
-    })
-    verdict_response = message(
-        SimpleNamespace(type="thinking", thinking=""),
-        text_block("VERDICT: WATCH\nREASONING: Evidence is incomplete.\nKEY SIGNALS:\n- Web search failed\nCONFIDENCE: LOW"),
-    )
-    fake_client = QueueClient([
-        message(text_block("Summary")),
-        message(text_block("Summary")),
-        verdict_response,
-    ])
-    monkeypatch.setattr("backend.agent.pipeline.get_client", lambda: fake_client)
+    }))
 
-    result = run_evaluation_pipeline("Example", {"raw_description": "analytics"})
 
-    assert result["web_search"]["summary"].splitlines()[0].startswith("SOURCE FAILED")
+def _verdict_client(monkeypatch, **overrides):
+    verdict = {
+        "decision": "WATCH", "confidence": "high", "reasoning": "Evidence is incomplete.",
+        "signals": [{"text": "Web search failed", "source_ids": [1, 99]}], "next_step": "Verify funding.",
+        "criteria": [{"criterion": "Company size", "status": "unknown", "evidence": "none", "source_ids": [2]}],
+        **overrides,
+    }
+    client = QueueClient([message(SimpleNamespace(type="thinking", thinking=""), text_block(json.dumps(verdict)))] * 5)
+    monkeypatch.setattr("backend.agent.pipeline.get_client", lambda: client)
+    return client
+
+
+@pytest.fixture(autouse=True)
+def _clear_cache():
+    evidence_cache.clear()
+
+
+def test_pipeline_caps_confidence_and_validates_citations(monkeypatch):
+    _stub_sources(monkeypatch, web_error="web search unavailable")
+    client = _verdict_client(monkeypatch)
+
+    result = run_evaluation_pipeline("Example", {"raw_description": "analytics", "target_company_size": "50-500"})
+
     assert result["verdict"]["decision"] == "WATCH"
+    # The model claimed "high", but both web searches failed and size has no evidence, so the code caps it.
+    assert result["verdict"]["model_confidence"] == "high"
     assert result["verdict"]["confidence"] == "low"
+    assert "Confidence capped" in result["verdict"]["confidence_note"]
+    # Source 99 doesn't exist (two URLs were cited), so it is dropped.
+    assert result["verdict"]["signals"][0]["source_ids"] == [1]
+    assert [s["id"] for s in result["sources"]] == [1, 2]
+    # One verdict call per run: no per-source summarize calls.
+    assert len(client.calls) == 1
+    assert client.calls[0]["output_config"]["format"]["type"] == "json_schema"
+    assert "SOURCE FAILED" in client.calls[0]["messages"][0]["content"]
+
+
+def test_rerun_reuses_cached_evidence_and_only_regenerates_the_verdict(monkeypatch):
+    calls = []
+    _stub_sources(monkeypatch, calls)
+    client = _verdict_client(monkeypatch)
+
+    run_evaluation_pipeline("Example Inc", {"raw_description": "a"}, "https://www.example.com/")
+    run_evaluation_pipeline("  example inc", {"raw_description": "a", "funding_stage": ["Seed"]}, "example.com")
+
+    assert sorted(calls) == ["hiring", "tech", "web"]
+    assert len(client.calls) == 2
+
+
+def test_failed_evidence_is_not_cached(monkeypatch):
+    calls = []
+    _stub_sources(monkeypatch, calls, web_error="boom")
+    _verdict_client(monkeypatch)
+
+    run_evaluation_pipeline("Example", {"raw_description": "a"})
+    run_evaluation_pipeline("Example", {"raw_description": "a"})
+
+    assert calls.count("web") == 2
+
+
+def test_news_failure_keeps_fundamentals(monkeypatch):
+    def fake_search(client, query, logger, operation):
+        if operation == "web_search.news":
+            raise TimeoutError("news timed out")
+        return "Acme has 120 employees.", ["https://example.com/a"]
+
+    monkeypatch.setattr(web_search, "get_client", lambda: object())
+    monkeypatch.setattr(web_search, "run_web_search", fake_search)
+    monkeypatch.setattr(web_search, "parse_company_signals", lambda *args: {"funding_stage": "Series A"})
+
+    data = web_search.get_web_search_data("Acme")["raw_data"]
+
+    assert data["fundamentals"] == "Acme has 120 employees."
+    assert data["company_signals"] == {"funding_stage": "Series A"}
+    assert data["news_error"] == "news timed out"
+    assert data["fundamentals_error"] is None
+    assert data["error"] is None
+
+
+def test_extractor_parse_failure_reports_source_error(monkeypatch):
+    monkeypatch.setattr(hiring_signals, "get_client", lambda: QueueClient([message(text_block("Roles found."))]))
+    monkeypatch.setattr(hiring_signals, "generate_json", lambda *a, **k: json.loads("not json"))
+    hiring = hiring_signals.get_hiring_signals("Example")["raw_data"]
+
+    monkeypatch.setattr(tech_signals, "get_client", lambda: QueueClient([message(text_block("Stack."))]))
+    monkeypatch.setattr(tech_signals, "generate_json", lambda *a, **k: json.loads("not json"))
+    tech = tech_signals.get_tech_signals("Example")["raw_data"]
+
+    assert hiring["error"] and hiring["hiring_active"] is False
+    assert tech["error"] and tech["technologies"] == {}
+
+
+def test_generate_json_rejects_refusals():
+    client = QueueClient([message(text_block(""), stop_reason="refusal")])
+
+    with pytest.raises(ValueError, match="refusal"):
+        generate_json(client, model="m", prompt="p", schema={}, operation="op", logger=SimpleNamespace(info=lambda *a, **k: None))
