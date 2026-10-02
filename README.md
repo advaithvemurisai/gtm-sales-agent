@@ -27,9 +27,9 @@ Built with React, FastAPI, and Claude. A typical analysis takes under a minute.
 - **Measured decisions.** Search approaches were benchmarked on real queries before choosing one, which cut a full analysis from about two minutes to under one.
 - **Fails gracefully.** A slow or failed source is reported as missing instead of breaking the verdict, and a failed extraction is never mistaken for negative evidence.
 - **Checked confidence.** The model's confidence is capped in code by how many sources failed and how many ICP criteria have no evidence behind them.
-- **Cited claims.** Every signal and criterion carries numbered source links, and the verdict card shows a criteria match table.
+- **Cited claims.** Every signal and criterion carries numbered source links, and the verdict shows a criteria scorecard (met / not met / no evidence for each criterion).
 - **Structured outputs.** Verdict and extractors use JSON-schema outputs, so there is no regex parsing of model text.
-- **Cheap reruns.** Evidence is cached for six hours per company, so re-running with edited criteria only regenerates the verdict (1 LLM call and about 7s, vs. 8 calls and about 20s fresh).
+- **Cheap reruns.** Evidence is cached for six hours per company, so re-running with edited criteria only regenerates the verdict (1 LLM call and about 7s, vs. 8 calls and about 24s fresh).
 - **Validated input** for everything a user can edit, and **tested** parsing, validation, and error handling.
 
 ## Run locally
@@ -57,10 +57,10 @@ Results from the Oct 1, 2026 run (15 cases, 3 runs each; repeat runs reuse the c
 | Agreement with the expected verdict set | 11 / 15 (73%) |
 | Stability (same decision on all 3 runs) | 13 / 15 (87%) |
 | Citation coverage (signals and criteria citing a source) | 100% |
-| Latency, fresh run | p50 24.4s · p95 26.0s |
+| Latency, fresh run | p50 24.4s · p95 26.0s · max 28.5s |
 | Cost per fresh run | $0.22 (8 LLM calls, web search fees excluded) |
 
-All four misses were deprioritized where a softer verdict was expected, and all four are well-funded, later-stage companies (Supabase, Vercel, Retool, Linear) checked against an inferred ICP that targets Series A/B. The verdict prompt treats a funding-stage mismatch as a strong deprioritize signal, so the model is applying the rule as written; the open question is whether that rule, or the expected labels, is too strict. Both unstable cases flip between Deprioritize and Watch on that same boundary. That is the next thing to tune, measured against this eval.
+All four misses were deprioritized where Pursue or Watch was expected, and all four are well-funded, later-stage companies (Supabase, Vercel, Retool, Linear). The likely cause is the verdict prompt's rule that a funding-stage mismatch is a strong deprioritize signal; this run didn't record the inferred criteria or per-case reasoning, so that's a hypothesis, not a confirmed finding (the script now saves the inferred criteria for the next run). The two unstable cases both flip between Deprioritize and Watch. Next step: confirm the cause, then decide whether the rule or the expected labels are too strict, and re-measure.
 
 ## Limitations
 

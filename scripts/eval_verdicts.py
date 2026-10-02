@@ -87,6 +87,9 @@ def run_case(case, icp, args, capture, decisions, row):
                 model_confidence=verdict["model_confidence"], latency_s=round(elapsed, 1),
                 cost_usd=round(capture.cost(), 4), llm_calls=len(capture.calls),
                 cited=cited, cited_total=total,
+                # Kept so a miss can be traced to the criterion that drove it.
+                reasoning=verdict.get("reasoning", ""),
+                criteria=[{k: c.get(k) for k in ("criterion", "status")} for c in verdict.get("criteria", [])],
             )
 
 
@@ -145,7 +148,7 @@ def main():
         "llm_calls_per_run": round(statistics.mean(r["llm_calls"] for r in rows), 1),
         "confidence_capped": sum(r["confidence"] != r["model_confidence"] for r in rows),
     }
-    Path(args.output).write_text(json.dumps({"summary": summary, "rows": rows}, indent=2) + "\n")
+    Path(args.output).write_text(json.dumps({"summary": summary, "icp_profiles": icps, "rows": rows}, indent=2) + "\n")
     print("\n" + json.dumps(summary, indent=2))
 
 
