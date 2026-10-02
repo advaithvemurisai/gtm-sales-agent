@@ -69,12 +69,12 @@ function InputPanel({ onAnalyze, companyName, setCompanyName, productDescription
             </div>
             <div className="command-field">
               <label htmlFor="website">website <span>(optional)</span></label>
-              <input id="website" type="text" inputMode="url" maxLength={200} value={companyWebsite} onChange={(event) => setCompanyWebsite(event.target.value)} placeholder="linear.app" />
+              <input id="website" type="text" inputMode="url" maxLength={200} value={companyWebsite} onChange={(event) => setCompanyWebsite(event.target.value)} placeholder="company.com" />
             </div>
           </div>
           {validationError && <p role="alert" className="form-error">{validationError}</p>}
           <div className="command-foot">
-            <span className="command-hint">~20s · 4 sources · every claim cited</span>
+            <span className="command-hint">~25s · 4 sources · every claim cited</span>
             <button className="btn btn-primary" type="submit">
               Check fit <kbd>{IS_MAC ? '⌘' : 'Ctrl'}↵</kbd>
             </button>
