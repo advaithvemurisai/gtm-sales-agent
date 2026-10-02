@@ -48,7 +48,19 @@ Open http://localhost:3000. Run the tests with `pytest`.
 
 ## Evaluating verdict quality
 
-`python scripts/eval_verdicts.py` runs 15 labeled cases (`scripts/eval_cases.json`: three seller products against five companies each, with the set of defensible verdicts for each) and reports agreement with the expected set, decision stability across repeat runs, citation coverage, p50/p95 latency, and token cost per run from the telemetry logs. The expected sets are the author's judgement, not ground truth. It makes paid API calls (about $0.20 per fresh run) and writes `scripts/eval_results.json`.
+`python scripts/eval_verdicts.py` runs 15 labeled cases (`scripts/eval_cases.json`: three seller products against five companies each, with the set of defensible verdicts for each) and reports agreement with the expected set, decision stability across repeat runs, citation coverage, p50/p95 latency, and token cost per run from the telemetry logs. The expected sets are the author's judgement, not ground truth. It makes paid API calls (about $0.22 per fresh run) and writes `scripts/eval_results.json`.
+
+Results from the Oct 1, 2026 run (15 cases, 3 runs each; repeat runs reuse the cached research, so stability measures the verdict step):
+
+| Metric | Result |
+|---|---|
+| Agreement with the expected verdict set | 11 / 15 (73%) |
+| Stability (same decision on all 3 runs) | 13 / 15 (87%) |
+| Citation coverage (signals and criteria citing a source) | 100% |
+| Latency, fresh run | p50 24.4s · p95 26.0s |
+| Cost per fresh run | $0.22 (8 LLM calls, web search fees excluded) |
+
+All four misses were deprioritized where a softer verdict was expected, and all four are well-funded, later-stage companies (Supabase, Vercel, Retool, Linear) checked against an inferred ICP that targets Series A/B. The verdict prompt treats a funding-stage mismatch as a strong deprioritize signal, so the model is applying the rule as written; the open question is whether that rule, or the expected labels, is too strict. Both unstable cases flip between Deprioritize and Watch on that same boundary. That is the next thing to tune, measured against this eval.
 
 ## Limitations
 

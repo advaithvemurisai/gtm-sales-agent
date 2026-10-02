@@ -1,0 +1,371 @@
+{
+  "summary": {
+    "cases": 15,
+    "runs_per_case": 3,
+    "agreement": 0.733,
+    "stability": 0.867,
+    "citation_coverage": 1.0,
+    "latency_p50_s": 24.4,
+    "latency_p95_s": 26.0,
+    "cost_per_run_usd": 0.222,
+    "llm_calls_per_run": 8,
+    "confidence_capped": 0
+  },
+  "rows": [
+    {
+      "company": "Linear",
+      "website": "linear.app",
+      "product": "spend",
+      "expected": [
+        "PURSUE",
+        "WATCH"
+      ],
+      "decision": "DEPRIORITIZE",
+      "confidence": "medium",
+      "model_confidence": "medium",
+      "latency_s": 24.4,
+      "cost_usd": 0.2127,
+      "llm_calls": 8,
+      "cited": 8,
+      "cited_total": 8,
+      "decisions": [
+        "DEPRIORITIZE",
+        "DEPRIORITIZE",
+        "WATCH"
+      ],
+      "agree": false,
+      "stable": false
+    },
+    {
+      "company": "Attio",
+      "website": "attio.com",
+      "product": "spend",
+      "expected": [
+        "PURSUE",
+        "WATCH"
+      ],
+      "decision": "PURSUE",
+      "confidence": "medium",
+      "model_confidence": "medium",
+      "latency_s": 23.3,
+      "cost_usd": 0.2154,
+      "llm_calls": 8,
+      "cited": 8,
+      "cited_total": 8,
+      "decisions": [
+        "PURSUE",
+        "PURSUE",
+        "PURSUE"
+      ],
+      "agree": true,
+      "stable": true
+    },
+    {
+      "company": "Ramp",
+      "website": "ramp.com",
+      "product": "spend",
+      "expected": [
+        "DEPRIORITIZE"
+      ],
+      "decision": "DEPRIORITIZE",
+      "confidence": "high",
+      "model_confidence": "high",
+      "latency_s": 24.4,
+      "cost_usd": 0.2301,
+      "llm_calls": 8,
+      "cited": 8,
+      "cited_total": 8,
+      "decisions": [
+        "DEPRIORITIZE",
+        "DEPRIORITIZE",
+        "DEPRIORITIZE"
+      ],
+      "agree": true,
+      "stable": true
+    },
+    {
+      "company": "Stripe",
+      "website": "stripe.com",
+      "product": "spend",
+      "expected": [
+        "DEPRIORITIZE",
+        "WATCH"
+      ],
+      "decision": "DEPRIORITIZE",
+      "confidence": "high",
+      "model_confidence": "high",
+      "latency_s": 28.5,
+      "cost_usd": 0.2524,
+      "llm_calls": 8,
+      "cited": 8,
+      "cited_total": 8,
+      "decisions": [
+        "DEPRIORITIZE",
+        "DEPRIORITIZE",
+        "DEPRIORITIZE"
+      ],
+      "agree": true,
+      "stable": true
+    },
+    {
+      "company": "Walmart",
+      "website": "walmart.com",
+      "product": "spend",
+      "expected": [
+        "DEPRIORITIZE"
+      ],
+      "decision": "DEPRIORITIZE",
+      "confidence": "high",
+      "model_confidence": "high",
+      "latency_s": 24.2,
+      "cost_usd": 0.2221,
+      "llm_calls": 8,
+      "cited": 8,
+      "cited_total": 8,
+      "decisions": [
+        "DEPRIORITIZE",
+        "DEPRIORITIZE",
+        "DEPRIORITIZE"
+      ],
+      "agree": true,
+      "stable": true
+    },
+    {
+      "company": "Supabase",
+      "website": "supabase.com",
+      "product": "compliance",
+      "expected": [
+        "PURSUE",
+        "WATCH"
+      ],
+      "decision": "DEPRIORITIZE",
+      "confidence": "medium",
+      "model_confidence": "medium",
+      "latency_s": 24.3,
+      "cost_usd": 0.2273,
+      "llm_calls": 8,
+      "cited": 8,
+      "cited_total": 8,
+      "decisions": [
+        "DEPRIORITIZE",
+        "DEPRIORITIZE",
+        "DEPRIORITIZE"
+      ],
+      "agree": false,
+      "stable": true
+    },
+    {
+      "company": "Linear",
+      "website": "linear.app",
+      "product": "compliance",
+      "expected": [
+        "PURSUE",
+        "WATCH"
+      ],
+      "decision": "WATCH",
+      "confidence": "medium",
+      "model_confidence": "medium",
+      "latency_s": 21.5,
+      "cost_usd": 0.2131,
+      "llm_calls": 8,
+      "cited": 9,
+      "cited_total": 9,
+      "decisions": [
+        "WATCH",
+        "WATCH",
+        "WATCH"
+      ],
+      "agree": true,
+      "stable": true
+    },
+    {
+      "company": "Vanta",
+      "website": "vanta.com",
+      "product": "compliance",
+      "expected": [
+        "DEPRIORITIZE"
+      ],
+      "decision": "DEPRIORITIZE",
+      "confidence": "high",
+      "model_confidence": "high",
+      "latency_s": 26.0,
+      "cost_usd": 0.2452,
+      "llm_calls": 8,
+      "cited": 8,
+      "cited_total": 8,
+      "decisions": [
+        "DEPRIORITIZE",
+        "DEPRIORITIZE",
+        "DEPRIORITIZE"
+      ],
+      "agree": true,
+      "stable": true
+    },
+    {
+      "company": "Notion",
+      "website": "notion.so",
+      "product": "compliance",
+      "expected": [
+        "WATCH",
+        "DEPRIORITIZE"
+      ],
+      "decision": "WATCH",
+      "confidence": "medium",
+      "model_confidence": "medium",
+      "latency_s": 24.6,
+      "cost_usd": 0.2154,
+      "llm_calls": 8,
+      "cited": 8,
+      "cited_total": 8,
+      "decisions": [
+        "WATCH",
+        "WATCH",
+        "WATCH"
+      ],
+      "agree": true,
+      "stable": true
+    },
+    {
+      "company": "Google",
+      "website": "google.com",
+      "product": "compliance",
+      "expected": [
+        "DEPRIORITIZE"
+      ],
+      "decision": "DEPRIORITIZE",
+      "confidence": "high",
+      "model_confidence": "high",
+      "latency_s": 24.9,
+      "cost_usd": 0.2032,
+      "llm_calls": 8,
+      "cited": 8,
+      "cited_total": 8,
+      "decisions": [
+        "DEPRIORITIZE",
+        "DEPRIORITIZE",
+        "DEPRIORITIZE"
+      ],
+      "agree": true,
+      "stable": true
+    },
+    {
+      "company": "Retool",
+      "website": "retool.com",
+      "product": "devtools",
+      "expected": [
+        "PURSUE",
+        "WATCH"
+      ],
+      "decision": "DEPRIORITIZE",
+      "confidence": "medium",
+      "model_confidence": "medium",
+      "latency_s": 22.2,
+      "cost_usd": 0.2211,
+      "llm_calls": 8,
+      "cited": 8,
+      "cited_total": 8,
+      "decisions": [
+        "DEPRIORITIZE",
+        "WATCH",
+        "DEPRIORITIZE"
+      ],
+      "agree": false,
+      "stable": false
+    },
+    {
+      "company": "Linear",
+      "website": "linear.app",
+      "product": "devtools",
+      "expected": [
+        "PURSUE",
+        "WATCH"
+      ],
+      "decision": "WATCH",
+      "confidence": "medium",
+      "model_confidence": "medium",
+      "latency_s": 22.9,
+      "cost_usd": 0.215,
+      "llm_calls": 8,
+      "cited": 8,
+      "cited_total": 8,
+      "decisions": [
+        "WATCH",
+        "WATCH",
+        "WATCH"
+      ],
+      "agree": true,
+      "stable": true
+    },
+    {
+      "company": "Vercel",
+      "website": "vercel.com",
+      "product": "devtools",
+      "expected": [
+        "PURSUE",
+        "WATCH"
+      ],
+      "decision": "DEPRIORITIZE",
+      "confidence": "medium",
+      "model_confidence": "medium",
+      "latency_s": 24.9,
+      "cost_usd": 0.22,
+      "llm_calls": 8,
+      "cited": 8,
+      "cited_total": 8,
+      "decisions": [
+        "DEPRIORITIZE",
+        "DEPRIORITIZE",
+        "DEPRIORITIZE"
+      ],
+      "agree": false,
+      "stable": true
+    },
+    {
+      "company": "Microsoft",
+      "website": "microsoft.com",
+      "product": "devtools",
+      "expected": [
+        "DEPRIORITIZE"
+      ],
+      "decision": "DEPRIORITIZE",
+      "confidence": "high",
+      "model_confidence": "high",
+      "latency_s": 24.7,
+      "cost_usd": 0.2277,
+      "llm_calls": 8,
+      "cited": 8,
+      "cited_total": 8,
+      "decisions": [
+        "DEPRIORITIZE",
+        "DEPRIORITIZE",
+        "DEPRIORITIZE"
+      ],
+      "agree": true,
+      "stable": true
+    },
+    {
+      "company": "Shopify",
+      "website": "shopify.com",
+      "product": "devtools",
+      "expected": [
+        "DEPRIORITIZE",
+        "WATCH"
+      ],
+      "decision": "DEPRIORITIZE",
+      "confidence": "high",
+      "model_confidence": "high",
+      "latency_s": 20.6,
+      "cost_usd": 0.2125,
+      "llm_calls": 8,
+      "cited": 8,
+      "cited_total": 8,
+      "decisions": [
+        "DEPRIORITIZE",
+        "DEPRIORITIZE",
+        "DEPRIORITIZE"
+      ],
+      "agree": true,
+      "stable": true
+    }
+  ]
+}
