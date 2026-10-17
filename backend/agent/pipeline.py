@@ -8,6 +8,7 @@ from backend.tools.hiring_signals import get_hiring_signals
 from backend.tools.web_search import get_web_search_data
 from backend.agent import evidence_cache
 from backend.agent.confidence import assess_coverage, cap_confidence
+from backend.agent.criteria import missing_criteria, repair_criteria
 from backend.config import MAX_EVIDENCE_CHARS, SONNET_MODEL
 from backend.llm import generate_json, get_client, load_prompt
 
@@ -120,6 +121,14 @@ def run_evaluation_pipeline(
     progress("verdict")
     with timed_operation(logger, "generate_verdict", company=company_name):
         verdict = _generate_verdict(icp_profile, evidence, sources, system_prompt)
+    # The model occasionally returns a truncated scorecard; one retry usually fixes it.
+    if missing := missing_criteria(verdict, icp_profile):
+        logger.warning("Verdict scorecard incomplete for company=%s missing=%s; retrying", company_name, missing)
+        with timed_operation(logger, "generate_verdict_retry", company=company_name):
+            retry = _generate_verdict(icp_profile, evidence, sources, system_prompt)
+        if len(missing_criteria(retry, icp_profile)) <= len(missing):
+            verdict = retry
+    repair_criteria(verdict, icp_profile)
     _validate_source_ids(verdict, len(sources))
 
     coverage = assess_coverage(

@@ -1,5 +1,5 @@
 import logging
-from backend.config import HAIKU_MODEL
+from backend.config import EXTRACTION_EFFORT, EXTRACTION_MAX_TOKENS, SONNET_MODEL
 from backend.llm import generate_json, get_client
 from backend.errors import is_billing_error
 
@@ -23,7 +23,7 @@ _ICP_SCHEMA = {
 
 def infer_icp_signals(product_description: str) -> dict:
     """
-    Use Haiku to infer all five ICP fields from product description.
+    Use Sonnet to infer all five ICP fields from product description.
     Returns structured dict or safe fallback with nulls.
     """
 
@@ -53,11 +53,13 @@ Rules:
     try:
         return generate_json(
             get_client(),
-            model=HAIKU_MODEL,
+            model=SONNET_MODEL,
             prompt=prompt,
             schema=_ICP_SCHEMA,
             operation="infer_icp_signals",
             logger=logger,
+            max_tokens=EXTRACTION_MAX_TOKENS,
+            effort=EXTRACTION_EFFORT,
         )
     except Exception as error:
         logger.exception("ICP inference failed")

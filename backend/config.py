@@ -2,7 +2,10 @@ import os
 
 
 SONNET_MODEL = os.getenv("ANTHROPIC_SONNET_MODEL", "claude-sonnet-5-5")
-HAIKU_MODEL = os.getenv("ANTHROPIC_HAIKU_MODEL", "claude-haiku-4-5")
+# Extraction and ICP inference also run on Sonnet. Low effort keeps these simple structured reads fast;
+# the token headroom leaves room for adaptive thinking so a response is never cut off mid-JSON.
+EXTRACTION_EFFORT = "low"
+EXTRACTION_MAX_TOKENS = 4000
 # The basic search tool, not web_search_20260209: on this app's queries it measured ~21s per search
 # vs 34s-to-timeout for the dynamic-filtering variant, with ~5x fewer input tokens and fuller answers.
 WEB_SEARCH_TOOL = {"type": "web_search_20250305", "name": "web_search", "max_uses": 3}

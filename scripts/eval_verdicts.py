@@ -32,7 +32,7 @@ from backend.agent.icp import infer_icp_signals  # noqa: E402
 from backend.agent.pipeline import run_evaluation_pipeline  # noqa: E402
 
 # USD per 1M tokens (input, output), from Anthropic's published first-party rates. Update if they change.
-PRICES = {"claude-sonnet-5-5": (2.00, 10.00), "claude-haiku-4-5": (1.00, 5.00)}
+PRICES = {"claude-sonnet-5-5": (2.00, 10.00)}
 _USAGE = re.compile(r"LLM call completed operation=(\S+) model=(\S+) .*?input_tokens=(\d+) output_tokens=(\d+)")
 
 

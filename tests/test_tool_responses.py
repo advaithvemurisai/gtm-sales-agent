@@ -153,7 +153,9 @@ def test_pipeline_caps_confidence_and_validates_citations(monkeypatch):
 def test_rerun_reuses_cached_evidence_and_only_regenerates_the_verdict(monkeypatch):
     calls = []
     _stub_sources(monkeypatch, calls)
-    client = _verdict_client(monkeypatch)
+    client = _verdict_client(monkeypatch, criteria=[
+        {"criterion": "Funding stage", "status": "unknown", "evidence": "none", "source_ids": []},
+    ])
 
     run_evaluation_pipeline("Example Inc", {"raw_description": "a"}, "https://www.example.com/")
     run_evaluation_pipeline("  example inc", {"raw_description": "a", "funding_stage": ["Seed"]}, "example.com")

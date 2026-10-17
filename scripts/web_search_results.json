@@ -1,0 +1,1380 @@
+{
+  "summary": {
+    "companies": 16,
+    "runs": 32,
+    "field_accuracy": 0.995,
+    "per_field": {
+      "funding_stage": 0.969,
+      "headcount_range": 1.0,
+      "founded_year": 1.0,
+      "headquarters": 1.0,
+      "technology": 1.0,
+      "hiring": 1.0
+    },
+    "runs_with_source_errors": 0,
+    "firmographics_stable": "14/16",
+    "latency_p50_s": 15.3,
+    "latency_max_s": 17.7,
+    "note": "Run 2026-10-17, 2 runs per company, all after the funding-stage/headcount extractor fix except WS01-WS04 (Shopify, Datadog, Cloudflare, Atlassian), which scored 6/6 before it and were not rerun."
+  },
+  "rows": [
+    {
+      "id": "WS01",
+      "company": "Shopify",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Public",
+            "headcount_range": "1000+",
+            "founded_year": 2004,
+            "headquarters": "Ottawa, Ontario, Canada",
+            "technologies": [
+              "React",
+              "TypeScript",
+              "JavaScript",
+              "Remix",
+              "Hydrogen",
+              "Tailwind CSS",
+              "core-js",
+              "Open Graph",
+              "Google Fonts API",
+              "Priority Hints",
+              "HTTP/3",
+              "Ruby on Rails"
+            ],
+            "open_positions": [
+              "Senior Partner Solution Architect",
+              "Partner Solutions Architect (Cross-Border)",
+              "Partner Solution Architect (Global)",
+              "Enterprise Solution Engineer",
+              "Senior Solution Engineer (Mid Market)"
+            ]
+          },
+          "errors": {},
+          "source_count": 29,
+          "latency_s": 17.7
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Public",
+            "headcount_range": "1000+",
+            "founded_year": 2004,
+            "headquarters": "151 O'Connor Street, Ottawa, Ontario, Canada",
+            "technologies": [
+              "React",
+              "React Router",
+              "Remix",
+              "TypeScript",
+              "JavaScript",
+              "Hydrogen",
+              "React Native",
+              "FlashList",
+              "Skia",
+              "WebGPU",
+              "Reanimated",
+              "GraphQL"
+            ],
+            "open_positions": [
+              "Senior Partner Solution Architect",
+              "Enterprise Solution Engineer",
+              "Partner Solutions Architect (Cross-Border)",
+              "Partner Solution Architect (Global)",
+              "Senior Solution Engineer (Mid Market)"
+            ]
+          },
+          "errors": {},
+          "source_count": 26,
+          "latency_s": 15.7
+        }
+      ],
+      "code": "before extractor fix"
+    },
+    {
+      "id": "WS02",
+      "company": "Datadog",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Public",
+            "headcount_range": "1000+",
+            "founded_year": 2010,
+            "headquarters": "620 8th Ave, 45th Floor, New York, NY 10018, United States",
+            "technologies": [
+              "React",
+              "TypeScript",
+              "Hugo",
+              "Bootstrap",
+              "Go",
+              "Python",
+              "Java",
+              "Rust",
+              "C++",
+              "Ruby",
+              "PHP",
+              "Kafka"
+            ],
+            "open_positions": [
+              "Enterprise Sales Executive",
+              "Strategic Account Executive",
+              "Major Account Manager",
+              "Commercial Sales Engineer",
+              "Senior Sales Engineer, Majors"
+            ]
+          },
+          "errors": {},
+          "source_count": 32,
+          "latency_s": 16.4
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Public",
+            "headcount_range": "1000+",
+            "founded_year": 2010,
+            "headquarters": "620 8th Avenue, New York City",
+            "technologies": [
+              "React",
+              "TypeScript",
+              "Redux",
+              "Hugo",
+              "Bootstrap",
+              "Alpine.js",
+              "Webpack",
+              "Module Federation",
+              "JavaScript",
+              "WordPress",
+              "Go",
+              "Python"
+            ],
+            "open_positions": [
+              "Enterprise Sales Executive (SLED)",
+              "Strategic Account Executive",
+              "Major Account Manager",
+              "Commercial Sales Engineer",
+              "Sales Development Representative"
+            ]
+          },
+          "errors": {},
+          "source_count": 32,
+          "latency_s": 14.6
+        }
+      ],
+      "code": "before extractor fix"
+    },
+    {
+      "id": "WS03",
+      "company": "Cloudflare",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Public",
+            "headcount_range": "1000+",
+            "founded_year": 2009,
+            "headquarters": "San Francisco, CA",
+            "technologies": [
+              "HTML",
+              "CSS",
+              "JavaScript",
+              "TypeScript",
+              "Go",
+              "Rust",
+              "Lua",
+              "SQL",
+              "NGINX",
+              "Cap'n Proto",
+              "Zstandard",
+              "Workers"
+            ],
+            "open_positions": [
+              "Software Engineer, Agentic Discovery",
+              "Senior Software Engineer, Security Platform",
+              "Senior Software Engineer, Cloudflare for SaaS",
+              "Engineering Manager, Edge SRE",
+              "Senior Software Engineer, Zero Trust Client"
+            ]
+          },
+          "errors": {},
+          "source_count": 34,
+          "latency_s": 17.0
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Public",
+            "headcount_range": "1000+",
+            "founded_year": 2009,
+            "headquarters": "101 Townsend Street, San Francisco, CA 94107",
+            "technologies": [
+              "Browserify",
+              "cf-ui",
+              "Rust",
+              "Go",
+              "Workers",
+              "NGINX",
+              "Kafka",
+              "Postgres",
+              "TimescaleDB",
+              "Salt",
+              "Docker",
+              "Jetflow"
+            ],
+            "open_positions": [
+              "Software Engineer, Agentic Discovery",
+              "Senior Software Engineer, Cloudflare for SaaS",
+              "Senior Software Engineer, Zero Trust Client",
+              "Senior Software Engineer, Load Balancing",
+              "Software Engineer, Mobile SDK"
+            ]
+          },
+          "errors": {},
+          "source_count": 37,
+          "latency_s": 16.4
+        }
+      ],
+      "code": "before extractor fix"
+    },
+    {
+      "id": "WS04",
+      "company": "Atlassian",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Public",
+            "headcount_range": "1000+",
+            "founded_year": 2002,
+            "headquarters": "Sydney, New South Wales, Australia",
+            "technologies": [
+              "React",
+              "TypeScript",
+              "Atlaskit",
+              "Atlassian Design Guidelines",
+              "Java",
+              "Kotlin",
+              "Node.js",
+              "Python",
+              "Spring Boot",
+              "Express",
+              "Forge",
+              "AWS"
+            ],
+            "open_positions": [
+              "Senior Machine Learning System Engineer, Agentic Search & Intelligence",
+              "Principal Machine Learning Engineer",
+              "Principal Data Scientist",
+              "Backend Software Engineer",
+              "Senior Full Stack Software Engineer"
+            ]
+          },
+          "errors": {},
+          "source_count": 26,
+          "latency_s": 15.6
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Public",
+            "headcount_range": "1000+",
+            "founded_year": 2002,
+            "headquarters": "San Francisco",
+            "technologies": [
+              "React",
+              "Atlaskit",
+              "Atlassian Design System",
+              "Tesseract",
+              "Emotion",
+              "core-js",
+              "Priority Hints",
+              "TypeScript",
+              "HTML5",
+              "ESLint",
+              "Java",
+              "Kotlin"
+            ],
+            "open_positions": [
+              "Account Executive",
+              "Solutions Engineer",
+              "Senior Manager of Solutions Engineering",
+              "Head of Sales Development",
+              "Head of Customer Success EMEA (DX)"
+            ]
+          },
+          "errors": {},
+          "source_count": 25,
+          "latency_s": 15.3
+        }
+      ],
+      "code": "before extractor fix"
+    },
+    {
+      "id": "WS05",
+      "company": "Figma",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Public",
+            "headcount_range": "1000+",
+            "founded_year": 2012,
+            "headquarters": "San Francisco, California",
+            "technologies": [
+              "TypeScript",
+              "React",
+              "C++",
+              "WebAssembly",
+              "Skew",
+              "C++",
+              "TypeScript",
+              "LiveGraph",
+              "Multiplayer service",
+              "AWS",
+              "Postgres",
+              "Redis"
+            ],
+            "open_positions": [
+              "Forward Deployed Engineer",
+              "Data Platform Engineer",
+              "Compliance Engineer",
+              "Technical Program Manager, Infrastructure",
+              "Technical Program Manager, AI Tooling"
+            ]
+          },
+          "errors": {},
+          "source_count": 32,
+          "latency_s": 15.4
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Public",
+            "headcount_range": "1000+",
+            "founded_year": 2012,
+            "headquarters": "San Francisco, California, United States",
+            "technologies": [
+              "React",
+              "TypeScript",
+              "WebAssembly",
+              "C++",
+              "Electron",
+              "C++",
+              "Rust",
+              "TypeScript",
+              "Node.js",
+              "Ruby",
+              "Unicorn",
+              "Skew"
+            ],
+            "open_positions": [
+              "Software Engineer - Traffic",
+              "Manager of Software Engineering",
+              "Software Engineer Intern",
+              "Forward Deployed Engineer",
+              "Account Executive, Federal"
+            ]
+          },
+          "errors": {},
+          "source_count": 34,
+          "latency_s": 15.3
+        }
+      ],
+      "code": "after extractor fix"
+    },
+    {
+      "id": "WS06",
+      "company": "Stripe",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Growth",
+            "headcount_range": "1000+",
+            "founded_year": 2010,
+            "headquarters": "San Francisco, United States",
+            "technologies": [
+              "TypeScript",
+              "React",
+              "Swift",
+              "Kotlin",
+              "jQuery",
+              "HTML5",
+              "Next.js",
+              "Ruby",
+              "Sorbet",
+              "Java",
+              "Go",
+              "Scala"
+            ],
+            "open_positions": [
+              "Machine Learning Engineer, Radar",
+              "AI Engineer",
+              "Integration Engineer",
+              "Backend Engineer, Payments & Risk",
+              "Engineering Manager, Self Serve Direct Onboarding"
+            ]
+          },
+          "errors": {},
+          "source_count": 39,
+          "latency_s": 17.0
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Growth",
+            "headcount_range": "1000+",
+            "founded_year": 2010,
+            "headquarters": "San Francisco, United States",
+            "technologies": [
+              "TypeScript",
+              "React",
+              "JavaScript",
+              "Swift",
+              "Kotlin",
+              "Framer",
+              "Ruby",
+              "Sorbet",
+              "Java",
+              "Go",
+              "Scala",
+              "Python"
+            ],
+            "open_positions": [
+              "Machine Learning Engineer, Radar",
+              "Backend Engineer, Payments & Risk",
+              "Software Engineer, Internal Identity",
+              "Engineering Manager, Self Serve Direct Onboarding",
+              "Staff Security Engineer, Abuse Control"
+            ]
+          },
+          "errors": {},
+          "source_count": 42,
+          "latency_s": 17.7
+        }
+      ],
+      "code": "after extractor fix"
+    },
+    {
+      "id": "WS07",
+      "company": "Ramp",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Growth",
+            "headcount_range": "1000+",
+            "founded_year": 2019,
+            "headquarters": "New York, NY",
+            "technologies": [
+              "TypeScript",
+              "React",
+              "Vite",
+              "Ryu",
+              "Python",
+              "Celery",
+              "SQLAlchemy",
+              "Kotlin",
+              "AWS",
+              "Amazon Aurora",
+              "Amazon ElastiCache for Redis",
+              "Amazon ECS"
+            ],
+            "open_positions": [
+              "Software Engineer, Frontend",
+              "Mobile Engineer, iOS",
+              "Machine Learning Engineer",
+              "Applied AI Engineer",
+              "Security Engineer, Product"
+            ]
+          },
+          "errors": {},
+          "source_count": 32,
+          "latency_s": 13.4
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Growth",
+            "headcount_range": "1000+",
+            "founded_year": 2019,
+            "headquarters": "New York City",
+            "technologies": [
+              "TypeScript",
+              "React",
+              "Vite",
+              "Ryu",
+              "JavaScript",
+              "HTML5",
+              "CSS3",
+              "Kotlin",
+              "Swift",
+              "Framer",
+              "Webflow",
+              "Duda"
+            ],
+            "open_positions": [
+              "Software Engineer, Onboarding",
+              "Software Engineer, Production Engineering",
+              "Software Engineer, Security, Stablecoin",
+              "Machine Learning Engineer",
+              "Mobile Engineer, iOS"
+            ]
+          },
+          "errors": {},
+          "source_count": 30,
+          "latency_s": 13.5
+        }
+      ],
+      "code": "after extractor fix"
+    },
+    {
+      "id": "WS08",
+      "company": "Notion",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Series C",
+            "headcount_range": "501-1000",
+            "founded_year": 2013,
+            "headquarters": "San Francisco, California",
+            "technologies": [
+              "React.js",
+              "Next.js",
+              "JavaScript",
+              "TypeScript",
+              "HTML5",
+              "CSS 3",
+              "Electron",
+              "React Native",
+              "Kotlin",
+              "Swift",
+              "WASM SQLite",
+              "Node.js"
+            ],
+            "open_positions": [
+              "Software Engineer, Developer Platform",
+              "Security Engineer, Detection and Response",
+              "Engineering Manager, Mobile AI",
+              "Engineering Manager, Web Infrastructure",
+              "Forward Deployed Engineer, GTM"
+            ]
+          },
+          "errors": {},
+          "source_count": 32,
+          "latency_s": 15.1
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Growth",
+            "headcount_range": "501-1000",
+            "founded_year": 2013,
+            "headquarters": "San Francisco, California",
+            "technologies": [
+              "React.js",
+              "TypeScript",
+              "JavaScript",
+              "Next.js",
+              "HTML5",
+              "CSS 3",
+              "Kotlin",
+              "Swift",
+              "Node.js",
+              "Python",
+              "Postgres",
+              "Kafka"
+            ],
+            "open_positions": [
+              "Software Engineer Early Career",
+              "Forward Deployed Engineer GTM AMER",
+              "Technical Quality Program Manager",
+              "Security Engineer, Detection and Response",
+              "Engineering Manager, Mobile AI"
+            ]
+          },
+          "errors": {},
+          "source_count": 30,
+          "latency_s": 13.7
+        }
+      ],
+      "code": "after extractor fix"
+    },
+    {
+      "id": "WS09",
+      "company": "Supabase",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": null,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Growth",
+            "headcount_range": "201-500",
+            "founded_year": 2020,
+            "headquarters": "San Francisco, CA",
+            "technologies": [
+              "Next.js",
+              "React",
+              "Tailwind",
+              "MobX",
+              "Supabase UI",
+              "TypeScript",
+              "JavaScript",
+              "Vue.js",
+              "PostgreSQL",
+              "Elixir",
+              "Phoenix",
+              "Rust"
+            ],
+            "open_positions": [
+              "FinOps Data Engineer",
+              "Platform Engineer \u2013 Compute",
+              "Platform Engineer, Managed Postgres",
+              "Cloud Platform Engineer",
+              "Multigres Engineer"
+            ]
+          },
+          "errors": {},
+          "source_count": 30,
+          "latency_s": 15.7
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": null,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Growth",
+            "headcount_range": "201-500",
+            "founded_year": 2020,
+            "headquarters": "San Francisco",
+            "technologies": [
+              "Next.js",
+              "React",
+              "Tailwind",
+              "MobX",
+              "Supabase UI",
+              "TypeScript",
+              "JavaScript",
+              "Google Fonts",
+              "TypeScript",
+              "Go",
+              "Elixir",
+              "Phoenix"
+            ],
+            "open_positions": [
+              "FinOps Data Engineer",
+              "Platform Engineer - Compute",
+              "Platform Engineer (Managed Postgres)",
+              "Engineering Manager (Billing)",
+              "Platform Security Engineer"
+            ]
+          },
+          "errors": {},
+          "source_count": 29,
+          "latency_s": 13.3
+        }
+      ],
+      "code": "after extractor fix"
+    },
+    {
+      "id": "WS10",
+      "company": "Linear",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Series C",
+            "headcount_range": "201-500",
+            "founded_year": 2019,
+            "headquarters": "San Francisco, California, United States",
+            "technologies": [
+              "React",
+              "MobX",
+              "styled-components",
+              "Electron",
+              "Next.js",
+              "ProseMirror",
+              "Yjs",
+              "Radix UI",
+              "Rolldown-Vite",
+              "TypeScript",
+              "JavaScript",
+              "Node"
+            ],
+            "open_positions": [
+              "Product Engineer",
+              "Senior/Staff Product Engineer",
+              "Senior/Staff Fullstack Engineer",
+              "Analytics Engineer",
+              "Design Engineer (Web & Brand)"
+            ]
+          },
+          "errors": {},
+          "source_count": 29,
+          "latency_s": 14.8
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Series C",
+            "headcount_range": "201-500",
+            "founded_year": 2019,
+            "headquarters": "San Francisco, California",
+            "technologies": [
+              "React",
+              "MobX",
+              "styled-components",
+              "Rolldown-Vite",
+              "Rollup",
+              "Parcel",
+              "ProseMirror",
+              "y-prosemirror",
+              "Yjs",
+              "Radix UI",
+              "Next.js",
+              "Electron"
+            ],
+            "open_positions": [
+              "Product Engineer",
+              "Senior / Staff Product Engineer",
+              "Senior / Staff Fullstack Engineer",
+              "Analytics Engineer",
+              "Design Engineer (Web & Brand)"
+            ]
+          },
+          "errors": {},
+          "source_count": 27,
+          "latency_s": 14.5
+        }
+      ],
+      "code": "after extractor fix"
+    },
+    {
+      "id": "WS11",
+      "company": "PostHog",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Growth",
+            "headcount_range": "201-500",
+            "founded_year": 2020,
+            "headquarters": "San Francisco, CA",
+            "technologies": [
+              "React",
+              "Redux",
+              "Kea",
+              "Ant Design",
+              "Next.js",
+              "Tailwind CSS",
+              "GraphQL",
+              "Handlebars.js",
+              "Storybook",
+              "TypeScript",
+              "Django",
+              "Rust"
+            ],
+            "open_positions": [
+              "Backend Engineer \u2013 Ingestion",
+              "Backend Engineer \u2013 Billing",
+              "FinOps Engineer",
+              "ClickHouse Operations Engineer",
+              "Forward Deployed Engineer"
+            ]
+          },
+          "errors": {},
+          "source_count": 25,
+          "latency_s": 12.5
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Growth",
+            "headcount_range": "201-500",
+            "founded_year": 2020,
+            "headquarters": "San Francisco, CA",
+            "technologies": [
+              "React",
+              "Redux",
+              "Kea",
+              "Ant Design",
+              "TypeScript",
+              "Django",
+              "Rust",
+              "Python",
+              "Django REST Framework",
+              "Celery",
+              "Temporal",
+              "Dagster"
+            ],
+            "open_positions": [
+              "Backend Engineer",
+              "Product Engineer",
+              "Forward Deployed Engineer",
+              "AI Research Engineer",
+              "ClickHouse Operations Engineer"
+            ]
+          },
+          "errors": {},
+          "source_count": 26,
+          "latency_s": 14.4
+        }
+      ],
+      "code": "after extractor fix"
+    },
+    {
+      "id": "WS12",
+      "company": "Resend",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": null
+          },
+          "got": {
+            "funding_stage": "Series A",
+            "headcount_range": "51-200",
+            "founded_year": 2022,
+            "headquarters": "San Francisco, California",
+            "technologies": [
+              "React",
+              "Next.js",
+              "Tailwind CSS",
+              "Radix Primitives",
+              "Radix Colors",
+              "Framer Motion",
+              "Three.js",
+              "Lucide",
+              "Turbopack",
+              "LottieFiles",
+              "React Email",
+              "TypeScript"
+            ],
+            "open_positions": [
+              "Backend Engineer",
+              "Backend Engineer (MTA)",
+              "Platform Engineer",
+              "Security Engineer (Platform)",
+              "Software Engineer, Developer Tools"
+            ]
+          },
+          "errors": {},
+          "source_count": 31,
+          "latency_s": 13.5
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": null
+          },
+          "got": {
+            "funding_stage": "Series A",
+            "headcount_range": "51-200",
+            "founded_year": 2023,
+            "headquarters": "San Francisco, CA",
+            "technologies": [
+              "React",
+              "Next.js",
+              "Tailwind CSS",
+              "Radix Primitives",
+              "Radix Colors",
+              "React Server Components",
+              "SWR",
+              "Zod",
+              "Framer Motion",
+              "Three.js",
+              "Lucide",
+              "LottieFiles"
+            ],
+            "open_positions": [
+              "Backend Engineer",
+              "Backend Engineer, MTA",
+              "Platform Engineer",
+              "Security Engineer, Platform",
+              "Software Engineer, Developer Tools"
+            ]
+          },
+          "errors": {},
+          "source_count": 30,
+          "latency_s": 14.0
+        }
+      ],
+      "code": "after extractor fix"
+    },
+    {
+      "id": "WS13",
+      "company": "37signals",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": null
+          },
+          "got": {
+            "funding_stage": "Bootstrapped",
+            "headcount_range": "51-200",
+            "founded_year": 1999,
+            "headquarters": "Chicago, Illinois, United States",
+            "technologies": [
+              "Hotwire",
+              "Turbo",
+              "Stimulus",
+              "Hotwire Native",
+              "HTML5",
+              "Ruby",
+              "Ruby on Rails",
+              "Solid Queue",
+              "Solid Cache",
+              "Solid Cable",
+              "MySQL",
+              "Percona MySQL 8"
+            ],
+            "open_positions": []
+          },
+          "errors": {},
+          "source_count": 33,
+          "latency_s": 17.5
+        },
+        {
+          "fields": {
+            "funding_stage": false,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": null
+          },
+          "got": {
+            "funding_stage": "Series A",
+            "headcount_range": "51-200",
+            "founded_year": 1999,
+            "headquarters": "Chicago, Illinois, United States",
+            "technologies": [
+              "Hotwire",
+              "Turbo",
+              "Stimulus",
+              "importmap",
+              "PWAs",
+              "Ruby",
+              "Ruby on Rails",
+              "Solid Cache",
+              "Solid Queue",
+              "Solid Cable",
+              "Minitest",
+              "MySQL"
+            ],
+            "open_positions": []
+          },
+          "errors": {},
+          "source_count": 31,
+          "latency_s": 17.2
+        }
+      ],
+      "code": "after extractor fix"
+    },
+    {
+      "id": "WS14",
+      "company": "Vercel",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Growth",
+            "headcount_range": "501-1000",
+            "founded_year": 2015,
+            "headquarters": "San Francisco, California",
+            "technologies": [
+              "Next.js",
+              "React",
+              "TypeScript",
+              "JavaScript",
+              "HTML5",
+              "CSS 3",
+              "Tailwind CSS",
+              "Server Components",
+              "Webpack",
+              "Turbopack",
+              "Babel",
+              "SWC"
+            ],
+            "open_positions": [
+              "Software Engineer, Agent",
+              "Software Engineer - Next.js",
+              "Software Engineer, Compute",
+              "Software Engineer, Trust & Safety",
+              "Software Engineer, Workflows"
+            ]
+          },
+          "errors": {},
+          "source_count": 39,
+          "latency_s": 16.0
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Growth",
+            "headcount_range": "501-1000",
+            "founded_year": 2015,
+            "headquarters": "San Francisco, California",
+            "technologies": [
+              "Next.js",
+              "React",
+              "TypeScript",
+              "JavaScript",
+              "HTML5",
+              "CSS3",
+              "Tailwind CSS",
+              "Next.js Server Components",
+              "Vercel design system",
+              "Turbopack",
+              "Node.js",
+              "Go"
+            ],
+            "open_positions": [
+              "Software Engineer, Agent",
+              "Software Engineer - Next.js",
+              "Software Engineer, Compute",
+              "Software Engineer, Trust & Safety",
+              "Software Engineer, Workflows"
+            ]
+          },
+          "errors": {},
+          "source_count": 37,
+          "latency_s": 15.6
+        }
+      ],
+      "code": "after extractor fix"
+    },
+    {
+      "id": "WS15",
+      "company": "Mercury",
+      "nonexistent": false,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Growth",
+            "headcount_range": "1000+",
+            "founded_year": 2017,
+            "headquarters": "San Francisco, California",
+            "technologies": [
+              "TypeScript",
+              "React",
+              "Elm",
+              "HTML5",
+              "Google Fonts",
+              "Google Maps API",
+              "Haskell",
+              "Postgres",
+              "SQL",
+              "Swift",
+              "Kotlin",
+              "AWS"
+            ],
+            "open_positions": [
+              "Senior Compliance Risk Manager - Securities Compliance",
+              "Lead Compliance Risk Manager, Product Compliance - AI",
+              "Senior Manager - Compliance Governance",
+              "Senior Recruiter - Compliance",
+              "Head of Market & Liquidity Risk"
+            ]
+          },
+          "errors": {},
+          "source_count": 30,
+          "latency_s": 16.2
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Growth",
+            "headcount_range": "1000+",
+            "founded_year": 2017,
+            "headquarters": "San Francisco, California",
+            "technologies": [
+              "React",
+              "TypeScript",
+              "Elm",
+              "Swift",
+              "Kotlin",
+              "HTML5",
+              "Google Fonts",
+              "Google Maps API",
+              "Haskell",
+              "PostgreSQL",
+              "ghciwatch",
+              "static-ls"
+            ],
+            "open_positions": [
+              "Senior Operational Risk Manager",
+              "Senior Manager \u2013 Compliance Governance",
+              "Model Risk Manager",
+              "Head of Market & Liquidity Risk",
+              "Senior Machine Learning Operations Engineer"
+            ]
+          },
+          "errors": {},
+          "source_count": 27,
+          "latency_s": 12.9
+        }
+      ],
+      "code": "after extractor fix"
+    },
+    {
+      "id": "WS16",
+      "company": "Zentrovane Analytics",
+      "nonexistent": true,
+      "runs": [
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Unknown",
+            "headcount_range": "Unknown",
+            "founded_year": null,
+            "headquarters": null,
+            "technologies": [],
+            "open_positions": []
+          },
+          "errors": {},
+          "source_count": 0,
+          "latency_s": 9.0
+        },
+        {
+          "fields": {
+            "funding_stage": true,
+            "headcount_range": true,
+            "founded_year": true,
+            "headquarters": true,
+            "technology": true,
+            "hiring": true
+          },
+          "got": {
+            "funding_stage": "Unknown",
+            "headcount_range": "Unknown",
+            "founded_year": null,
+            "headquarters": null,
+            "technologies": [],
+            "open_positions": []
+          },
+          "errors": {},
+          "source_count": 0,
+          "latency_s": 8.0
+        }
+      ],
+      "code": "after extractor fix"
+    }
+  ]
+}

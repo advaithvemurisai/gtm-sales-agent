@@ -1,0 +1,397 @@
+{
+ "note": "Real companies with facts verified as of 2026-10-17. Each field lists every acceptable value; a field set to null is not graded because the true value isn't stable or verifiable. Funding stage uses the extractor's enum: Series D and later private rounds map to Growth. headquarters and tech_any match by case-insensitive substring. Zentrovane Analytics does not exist: every field should come back unknown or empty. Linear's headcount accepts both 51-200 and 201-500: trackers in Aug 2026 report ~280-290 (Tracxn, LeadIQ) while others still show ~120-140.",
+ "cases": [
+  {
+   "id": "WS01",
+   "company": "Shopify",
+   "website": "shopify.com",
+   "funding_stage": [
+    "Public"
+   ],
+   "headcount_range": [
+    "1000+"
+   ],
+   "founded_year": [
+    2004,
+    2006
+   ],
+   "headquarters": [
+    "Ottawa"
+   ],
+   "tech_any": [
+    "Ruby",
+    "Rails",
+    "MySQL"
+   ],
+   "hiring_active": true
+  },
+  {
+   "id": "WS02",
+   "company": "Datadog",
+   "website": "datadoghq.com",
+   "funding_stage": [
+    "Public"
+   ],
+   "headcount_range": [
+    "1000+"
+   ],
+   "founded_year": [
+    2010
+   ],
+   "headquarters": [
+    "New York"
+   ],
+   "tech_any": [
+    "Go",
+    "Python",
+    "Kafka"
+   ],
+   "hiring_active": true
+  },
+  {
+   "id": "WS03",
+   "company": "Cloudflare",
+   "website": "cloudflare.com",
+   "funding_stage": [
+    "Public"
+   ],
+   "headcount_range": [
+    "1000+"
+   ],
+   "founded_year": [
+    2009
+   ],
+   "headquarters": [
+    "San Francisco"
+   ],
+   "tech_any": [
+    "Rust",
+    "Go"
+   ],
+   "hiring_active": true
+  },
+  {
+   "id": "WS04",
+   "company": "Atlassian",
+   "website": "atlassian.com",
+   "funding_stage": [
+    "Public"
+   ],
+   "headcount_range": [
+    "1000+"
+   ],
+   "founded_year": [
+    2002
+   ],
+   "headquarters": [
+    "Sydney",
+    "San Francisco"
+   ],
+   "tech_any": [
+    "Java",
+    "AWS"
+   ],
+   "hiring_active": true
+  },
+  {
+   "id": "WS05",
+   "company": "Figma",
+   "website": "figma.com",
+   "funding_stage": [
+    "Public"
+   ],
+   "headcount_range": [
+    "1000+"
+   ],
+   "founded_year": [
+    2012
+   ],
+   "headquarters": [
+    "San Francisco"
+   ],
+   "tech_any": [
+    "C++",
+    "WebAssembly",
+    "TypeScript",
+    "React"
+   ],
+   "hiring_active": true
+  },
+  {
+   "id": "WS06",
+   "company": "Stripe",
+   "website": "stripe.com",
+   "funding_stage": [
+    "Growth"
+   ],
+   "headcount_range": [
+    "1000+"
+   ],
+   "founded_year": [
+    2010
+   ],
+   "headquarters": [
+    "San Francisco",
+    "Dublin"
+   ],
+   "tech_any": [
+    "Ruby",
+    "Java",
+    "Go"
+   ],
+   "hiring_active": true
+  },
+  {
+   "id": "WS07",
+   "company": "Ramp",
+   "website": "ramp.com",
+   "funding_stage": [
+    "Growth"
+   ],
+   "headcount_range": [
+    "501-1000",
+    "1000+"
+   ],
+   "founded_year": [
+    2019
+   ],
+   "headquarters": [
+    "New York"
+   ],
+   "tech_any": [
+    "Python",
+    "TypeScript",
+    "React",
+    "Kotlin"
+   ],
+   "hiring_active": true
+  },
+  {
+   "id": "WS08",
+   "company": "Notion",
+   "website": "notion.so",
+   "funding_stage": [
+    "Series C",
+    "Growth"
+   ],
+   "headcount_range": [
+    "501-1000",
+    "1000+"
+   ],
+   "founded_year": [
+    2013,
+    2016
+   ],
+   "headquarters": [
+    "San Francisco"
+   ],
+   "tech_any": [
+    "React",
+    "TypeScript",
+    "Postgres"
+   ],
+   "hiring_active": true
+  },
+  {
+   "id": "WS09",
+   "company": "Supabase",
+   "website": "supabase.com",
+   "funding_stage": [
+    "Growth"
+   ],
+   "headcount_range": [
+    "201-500",
+    "501-1000"
+   ],
+   "founded_year": [
+    2020
+   ],
+   "headquarters": null,
+   "tech_any": [
+    "Postgres",
+    "Elixir",
+    "TypeScript",
+    "Go"
+   ],
+   "hiring_active": true
+  },
+  {
+   "id": "WS10",
+   "company": "Linear",
+   "website": "linear.app",
+   "funding_stage": [
+    "Series C"
+   ],
+   "headcount_range": [
+    "51-200",
+    "201-500"
+   ],
+   "founded_year": [
+    2019
+   ],
+   "headquarters": [
+    "San Francisco"
+   ],
+   "tech_any": [
+    "TypeScript",
+    "React",
+    "Node",
+    "Postgres",
+    "GraphQL"
+   ],
+   "hiring_active": true
+  },
+  {
+   "id": "WS11",
+   "company": "PostHog",
+   "website": "posthog.com",
+   "funding_stage": [
+    "Growth"
+   ],
+   "headcount_range": [
+    "51-200",
+    "201-500"
+   ],
+   "founded_year": [
+    2020
+   ],
+   "headquarters": [
+    "San Francisco",
+    "London"
+   ],
+   "tech_any": [
+    "ClickHouse",
+    "Python",
+    "Django",
+    "Kafka"
+   ],
+   "hiring_active": true
+  },
+  {
+   "id": "WS12",
+   "company": "Resend",
+   "website": "resend.com",
+   "funding_stage": [
+    "Series A"
+   ],
+   "headcount_range": [
+    "11-50",
+    "51-200"
+   ],
+   "founded_year": [
+    2022,
+    2023
+   ],
+   "headquarters": [
+    "San Francisco"
+   ],
+   "tech_any": [
+    "TypeScript",
+    "React",
+    "Node",
+    "AWS",
+    "Next.js"
+   ],
+   "hiring_active": null
+  },
+  {
+   "id": "WS13",
+   "company": "37signals",
+   "website": "37signals.com",
+   "funding_stage": [
+    "Bootstrapped"
+   ],
+   "headcount_range": [
+    "11-50",
+    "51-200"
+   ],
+   "founded_year": [
+    1999
+   ],
+   "headquarters": [
+    "Chicago"
+   ],
+   "tech_any": [
+    "Ruby",
+    "Rails",
+    "Hotwire"
+   ],
+   "hiring_active": null
+  },
+  {
+   "id": "WS14",
+   "company": "Vercel",
+   "website": "vercel.com",
+   "funding_stage": [
+    "Growth",
+    "Public"
+   ],
+   "headcount_range": [
+    "501-1000",
+    "1000+"
+   ],
+   "founded_year": [
+    2015
+   ],
+   "headquarters": [
+    "San Francisco"
+   ],
+   "tech_any": [
+    "Next.js",
+    "React",
+    "TypeScript",
+    "Rust",
+    "Go"
+   ],
+   "hiring_active": true
+  },
+  {
+   "id": "WS15",
+   "company": "Mercury",
+   "website": "mercury.com",
+   "tests": "Name collides with public companies (Mercury Systems, Mercury General); the fintech is private.",
+   "funding_stage": [
+    "Series C",
+    "Growth"
+   ],
+   "headcount_range": [
+    "501-1000",
+    "1000+"
+   ],
+   "founded_year": [
+    2017
+   ],
+   "headquarters": [
+    "San Francisco"
+   ],
+   "tech_any": [
+    "Haskell",
+    "TypeScript",
+    "React",
+    "Nix"
+   ],
+   "hiring_active": true
+  },
+  {
+   "id": "WS16",
+   "company": "Zentrovane Analytics",
+   "website": "zentrovane-analytics.com",
+   "tests": "Fictional company: any concrete fact returned is a hallucination.",
+   "nonexistent": true,
+   "funding_stage": [
+    "Unknown"
+   ],
+   "headcount_range": [
+    "Unknown"
+   ],
+   "founded_year": [
+    null
+   ],
+   "headquarters": [
+    null
+   ],
+   "tech_any": [],
+   "hiring_active": false
+  }
+ ]
+}
