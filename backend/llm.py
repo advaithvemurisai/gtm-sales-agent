@@ -80,12 +80,28 @@ def generate_json(
     return parse_json_object(response_text(response))
 
 
+def _join_text(content: list) -> str:
+    """Join text blocks as written. Search answers split text at every citation, so adjacent blocks are
+    fragments of one passage and join directly; text separated by a search call starts a new paragraph."""
+    parts: list[str] = []
+    after_other_block = False
+    for block in content:
+        if getattr(block, "type", None) != "text":
+            after_other_block = bool(parts)
+            continue
+        if after_other_block:
+            parts.append("\n\n")
+            after_other_block = False
+        parts.append(block.text)
+    return "".join(parts).strip()
+
+
 def run_web_search(client: Anthropic, query: str, logger: logging.Logger, operation: str) -> tuple[str, list[str]]:
     """Run a web search turn and return its text plus the cited source URLs."""
     # A timed-out search rarely succeeds on retry; fail fast and let the caller report the source as unavailable.
     search_client = client.with_options(timeout=SEARCH_TIMEOUT_SECONDS, max_retries=0)
     messages = [{"role": "user", "content": query}]
-    content = []
+    turns: list[list] = []
     for _ in range(_MAX_SEARCH_CONTINUATIONS + 1):
         started_at = time.perf_counter()
         response = search_client.messages.create(
@@ -96,13 +112,14 @@ def run_web_search(client: Anthropic, query: str, logger: logging.Logger, operat
             messages=messages,
         )
         log_anthropic_usage(logger, operation=operation, model=SONNET_MODEL, started_at=started_at, response=response)
-        content.extend(response.content)
+        turns.append(list(response.content))
         if getattr(response, "stop_reason", None) != "pause_turn":
             break
         messages = [*messages, {"role": "assistant", "content": response.content}]
 
-    text_blocks = [block for block in content if getattr(block, "type", None) == "text"]
-    text = " ".join(block.text for block in text_blocks).strip()
+    # A paused turn resumes after a search call, so each response's text starts a new paragraph.
+    text = "\n\n".join(part for part in (_join_text(turn) for turn in turns) if part)
+    text_blocks = [block for turn in turns for block in turn if getattr(block, "type", None) == "text"]
     urls = [
         citation.url
         for block in text_blocks

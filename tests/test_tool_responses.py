@@ -79,7 +79,7 @@ def test_web_search_resumes_paused_turns():
 
     text, _ = run_web_search(client, "query", SimpleNamespace(info=lambda *a, **k: None), "test")
 
-    assert text == "Part one. Part two."
+    assert text == "Part one.\n\nPart two."
     assert len(client.calls) == 2
     assert client.calls[1]["messages"][-1]["role"] == "assistant"
 

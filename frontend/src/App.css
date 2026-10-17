@@ -261,6 +261,12 @@ a { color: var(--accent); }
 .prose strong { color: var(--ink); font-weight: 600; }
 .prose-heading { font-size: 13px !important; font-weight: 600; color: var(--ink) !important; letter-spacing: -0.005em; }
 .prose-list { list-style: none; display: grid; gap: 8px; }
+.prose-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.prose-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.6; }
+.prose-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--ink-3); padding: 0 16px 8px 0; border-bottom: 1px solid var(--rule); }
+.prose-table td { vertical-align: top; color: var(--ink-2); padding: 10px 16px 10px 0; border-bottom: 1px solid var(--rule); min-width: 9em; }
+.prose-table td:first-child { color: var(--ink); width: 28%; min-width: 7em; }
+.prose-table tr:last-child td { border-bottom: none; }
 .prose-list li { position: relative; padding-left: 16px; font-size: 14px; line-height: 1.65; color: var(--ink-2); }
 .prose-list li::before { content: ''; position: absolute; left: 2px; top: 10px; width: 5px; height: 5px; border-radius: 1px; background: var(--ink-3); }
 

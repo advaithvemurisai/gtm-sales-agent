@@ -4,7 +4,7 @@
 
 **Live demo:** [gtm-sales-agent.vercel.app](https://gtm-sales-agent.vercel.app)
 
-![A saved example: a Deprioritize verdict for Linear with medium confidence, a fit score of 2 of 5 criteria, a criteria scorecard with cited sources, and the numbered source ledger](frontend/public/result.png)
+![A saved example: a Pursue verdict for Linear with medium confidence, a fit score of 4 of 5 criteria, a criteria scorecard with cited sources, and the numbered source ledger](frontend/public/result.png)
 
 ## What you get
 

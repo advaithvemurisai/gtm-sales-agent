@@ -1,115 +1,111 @@
 {
   "company_name": "Linear",
   "icp_profile": {
-    "target_company_size": "50-500",
+    "target_company_size": "50-1000",
     "funding_stage": [
       "Series A",
-      "Series B"
+      "Series B",
+      "Series C"
     ],
     "tech_signals": [
+      "NetSuite",
+      "QuickBooks",
+      "Slack",
       "Expensify",
-      "Brex",
-      "Bill.com",
-      "Stripe",
-      "Ramp"
+      "Workday"
     ],
     "hiring_signals": [
-      "Finance Operations Manager",
-      "VP of Finance",
       "Controller",
-      "Expense Management Lead",
-      "FP&A Manager"
+      "VP of Finance",
+      "Head of Accounting",
+      "Director of FP&A",
+      "Finance Operations Manager"
     ],
     "budget_indicator": "mid-market",
     "raw_description": "Spend management and corporate cards for fast-growing tech companies."
   },
   "verdict": {
-    "decision": "DEPRIORITIZE",
-    "reasoning": "Funding stage is Series C, outside the Series A/B target, and the ICP treats a stage mismatch as a strong deprioritize signal (Sacra, Arctic Startup). Company size of roughly 120-140 fits the 50-500 range, and ~$100M ARR with profitability means plenty of budget, but none of the ICP's finance tools appear in the tech stack and no finance-role hiring was found.",
+    "decision": "PURSUE",
+    "reasoning": "Linear fits on company size (201-500 headcount, roughly 270-290 per Tracxn), funding stage (Series C, $82M in June 2025) and budget ($100M ARR, cashflow positive, $134M raised) per web search sources [16][18]. Slack is confirmed in the tech stack [2][8] and a finance tool (Mercury) is listed, but no finance-leader hiring roles appear and Linear sells project management software, not spend management, so it is not a competitor. Confidence is medium because headcount figures conflict and the tools listing shows no NetSuite, QuickBooks, Expensify or Workday.",
     "signals": [
       {
-        "text": "Funding stage: Series C ($82M, June 2025) and a later $2.5B tender offer put it past the Series A/B target.",
+        "text": "Company size: 201-500 headcount range, with the latest data point at 291 employees (Aug 2026), inside the 50-1000 target.",
         "source_ids": [
-          14,
-          19,
-          22
+          16,
+          17
         ]
       },
       {
-        "text": "Company size: about 118-141 employees fits the 50-500 range, though third-party counts conflict.",
+        "text": "Funding stage and budget: Series C ($82M, June 2025, led by Accel), $134M total raised and about $100M ARR, so mid-market budget capacity is clear.",
         "source_ids": [
+          16,
+          18,
+          23
+        ]
+      },
+      {
+        "text": "Technology: Slack is in the stack; Mercury is used for finance. No ERP or expense tool (NetSuite, QuickBooks, Expensify, Workday) was found, and no finance roles are open (hiring is engineering, design, GTM, recruiting).",
+        "source_ids": [
+          2,
+          8,
           12,
-          13,
-          15,
-          16
-        ]
-      },
-      {
-        "text": "Hiring roles: open roles are engineering, product, design, legal and customer success. There are no finance operations, controller, or FP&A roles, though Mercury is a likely bank tool.",
-        "source_ids": [
-          5,
-          6,
-          10,
-          11
+          13
         ]
       }
     ],
-    "color": "red",
+    "color": "green",
     "confidence": "medium",
-    "next_step": "Revisit only if Linear hires a Controller, VP of Finance or expense lead, or if broader mid-market fit criteria are accepted. Otherwise do not prioritize outreach now.",
+    "next_step": "Contact the Head of Finance or Operations (no Controller or VP of Finance posting is visible, so confirm who owns finance). Open with the growth story ($100M ARR, remote-first team across many locations, plus the August 2026 secondary) and ask how they handle card spend and expense workflows beyond Mercury.",
     "confidence_note": "",
     "criteria": [
       {
-        "criterion": "Company size 50-500",
+        "criterion": "Company size",
         "status": "met",
-        "evidence": "Headcount 51-200; estimates of ~118-141 employees",
+        "evidence": "201-500 headcount; Tracxn shows 291 as of Aug 2026, though other sources conflict (118 to 269)",
         "source_ids": [
-          13,
-          15
-        ]
-      },
-      {
-        "criterion": "Funding stage Series A/B",
-        "status": "not_met",
-        "evidence": "Series C, $82M raised June 2025 at $1.25B valuation",
-        "source_ids": [
-          14,
+          16,
+          17,
           19
         ]
       },
       {
-        "criterion": "Technology: Expensify, Brex, Bill.com, Stripe, Ramp",
-        "status": "not_met",
-        "evidence": "None confirmed in stack; Mercury listed for banking; Ramp is a Linear customer, not a confirmed tool",
+        "criterion": "Funding stage",
+        "status": "met",
+        "evidence": "Series C, $82M raised June 2025 at $1.25B valuation",
         "source_ids": [
-          1,
-          2,
-          3,
-          4,
-          22
+          16,
+          18,
+          23
         ]
       },
       {
-        "criterion": "Hiring roles: finance operations, controller, FP&A",
-        "status": "not_met",
-        "evidence": "Open roles are engineering, product, design, legal, customer success, recruiting and analytics; no finance roles",
+        "criterion": "Technology",
+        "status": "met",
+        "evidence": "Slack confirmed in job posting and tools listing; Mercury also used; no NetSuite, QuickBooks, Expensify or Workday found",
         "source_ids": [
-          5,
-          6,
-          7,
+          2,
           8,
-          9,
-          10,
           11
         ]
       },
       {
-        "criterion": "Budget tier: mid-market",
-        "status": "met",
-        "evidence": "About $100M ARR, cashflow positive since 2021, $134M total primary funding",
+        "criterion": "Hiring roles",
+        "status": "not_met",
+        "evidence": "Open roles are engineering, design, product, CS, RevOps and recruiting; no Controller, VP Finance, FP&A or accounting roles seen",
         "source_ids": [
+          12,
           13,
           14
+        ]
+      },
+      {
+        "criterion": "Budget",
+        "status": "met",
+        "evidence": "About $100M ARR, cashflow positive since 2021, $134M total funding",
+        "source_ids": [
+          16,
+          18,
+          24
         ]
       }
     ]
@@ -118,139 +114,169 @@
     "company_signals": {
       "funding_stage": "Series C",
       "total_funding": "$134M",
-      "headcount": 130,
-      "headcount_range": "51-200",
+      "headcount": 291,
+      "headcount_range": "201-500",
       "founded_year": 2019,
       "headquarters": "San Francisco, California",
       "revenue_estimate": "$100M"
     },
-    "technology": "- **Frontend:** React, MobX, styled-components\n- **Backend:** Node, Postgres, Temporal, Redis\n- **Infrastructure:** Google Cloud, Kubernetes, Cloud SQL\n- **Other:** TypeScript, GraphQL, WebSocket",
-    "hiring": "- **Hiring actively:** yes\n- **Open roles:** Senior / Staff Product Engineer, Senior / Staff Product Engineer, AI, Senior / Staff Fullstack Engineer, Senior / Staff Product Manager, Senior / Staff Product Designer, Senior Counsel, Product Support Specialist, Customer Success Manager, Growth, Technical Recruiter, Analytics Engineer\n- **Departments:** Engineering, Product Management, Design, Legal, Customer Success, Operations, Data Science\n- **Headcount trend:** growing",
-    "web_search": "**Fundamentals**\n**Linear (linear.app)**\n\n- **Funding stage:**  Linear is a Series C company . Its latest primary round was  a Series C on Jun 10, 2025, for $82M .  Getlatka also reports a 2026 secondary round at a $2.5B valuation. \n- **Total funding:** About **$134M** in primary funding.  Sacra puts it at $134.2 million across all rounds, with Accel and Sequoia as the main backers.  Getlatka's higher figure of $234.2M includes the $100M secondary round. A secondary round sells existing shares, so it isn't new money for the company.\n- **Employee headcount:** Sources disagree, and the reasonable range is roughly 120\u2013140.  PitchBook lists 141 employees as of 2026.   Getlatka lists about 118.  Tracxn shows 280, and StartupHub shows about 50. Those two look like outliers.\n- **Founded:** **2019**.  It was co-founded by Karri Saarinen, Tuomas Artman, and others from Airbnb, Coinbase, and Uber. \n- **Headquarters:** **San Francisco, California**.  CB Insights gives the address as 2261 Market Street. \n- **Revenue estimate:** About **$100M ARR**.  Sacra estimates Linear hit $100M in annual recurring revenue in July 2026.   More than 40,000 companies pay for it.   Sacra also says it has been cashflow positive since 2021.  Older estimates are much lower, such as ZoomInfo's $42M and Growjo's $18.8M, and they appear to be outdated.\n\n**Recent news**\n# Linear: key news, 2025\u20132026\n\n## Funding and valuation\n- **June 2025, Series C:**  Linear raised an $82M Series C at a $1.25B valuation.   The round had both primary and secondary funding. Accel led it, with continued support from Sequoia and 01A.   The company said it would use the money to integrate AI more deeply, focusing on workflow automation and coordination between human teams and software agents. \n- **August 2026, tender offer:**  Linear completed an employee tender offer at a $2.5B valuation, led by Accel. Existing investor 01 Advisors took part, as did new investors Salesforce Ventures and S32.   The $99M went to employees rather than to Linear's balance sheet.  That is roughly double the Series C valuation.\n\n## Growth\n- **Revenue:** Linear passed $100M in ARR.  The company said it wanted to give its team another chance to share in the upside. \n- **Customers:**  A February 2026 profile reported more than 20,000 company customers, including OpenAI, Perplexity, Cursor, Ramp, and Vercel.  Getlatka lists 40K customers, but that figure is a third-party estimate and I couldn't confirm it.\n- **Profitability:** At the Series C,  Linear reported 280% profit growth the previous year and more than 15,000 customers. \n\n## Hiring and team\nLinear has kept its team small.  It had about 80 people working remotely at the Series C.  Later estimates range from about 118 (Getlatka) to 141 (PitchBook), and these are third-party figures.  The company says it has grown the team slowly and intentionally, and that it operates profitably and remotely. \n\n## Product launches\n- **March 2026, Linear Agent:**  Linear introduced Linear Agent, an AI feature that synthesizes workspace context to streamline product development.  The same day, CEO Karri Saarinen published \"Issue tracking is dead.\"  It argues for replacing traditional issue tracking with an agent-driven system. \n- **March 2026, Insights:**  Linear Insights is an analytics and reporting feature for product planning. \n- **July 2026, Loops:**  Loops lets teams run recurring agent workflows within Linear Agent. \n- **August 2026, coding sessions:**  Linear Agent can now set up, run, and test code in configurable environments for Python, Ruby, Go, and more.   Claude Opus 5 can be selected to draft pull requests from Linear work items. \n- **Mobile:**  A native Android app is available.   Mobile coding sessions let users review code and comment from a phone. \n\n## Partnerships and integrations\n- **Gemini Enterprise (March 2026):**  A new integration lets users search, summarize, and analyze Linear issues and projects from within Gemini. \n- **Salesforce Ventures** became an investor through the 2026 tender offer.\n- **Anthropic:** Linear appeared in a talk with Raycast and Anthropic, and it supports Claude models in its coding sessions.\n- **Sequoia:** Linear also joined Sequoia Capital for a discussion on AI agents and the future of software teams.\n\n## Setbacks\nLinear published a post-mortem on a security incident that happened on March 24, 2026.  The post-mortem is dated April 6, 2026.  I didn't find details on its scope.\n\n**Caveats:** Some figures, such as headcount, total funding, and customer counts, come from third-party aggregators and conflict with each other. Linear's own posts are the most reliable source. They are at linear.app/now.",
+    "technology": "- **Frontend:** TypeScript, JavaScript, React, MobX, styled-components, ProseMirror, Electron, Yjs, Radix UI, Rolldown-Vite, Next.js\n- **Backend:** Node.js, GraphQL, Postgres, Redis, Temporal, WebSocket sync engine, OpenAI JS SDK, Sanity, Algolia, Stripe\n- **Infrastructure:** Google Cloud, Kubernetes, Cloudflare, Google Cloud CDN, Let's Encrypt\n- **Other:** GitHub, Slack, Notion, Mercury, Ashby, Figma",
+    "hiring": "- **Hiring actively:** yes\n- **Open roles:** Senior / Staff Product Engineer, Senior / Staff Fullstack Engineer, Product Engineer, Analytics Engineer, Design Engineer, Solutions Engineer, Growth, Senior / Staff Product Designer, Mobile Product Designer, Production Designer, Product Manager\n- **Departments:** Engineering, Design, Product and marketing, Customer success, support and sales, People and recruiting\n- **Headcount trend:** growing",
+    "web_search": "**Fundamentals**\n**Linear (linear.app)**\n\n- **Funding stage:** Series C. The latest priced round was a Series C on Jun 10, 2025, for $82M. A later secondary sale reportedly valued the company at about $2.5B. The sale was structured so that $99M went to employees rather than to Linear's balance sheet. That means it wasn't new primary funding.\n- **Total funding:** about $134M. Sacra puts the figure at $134.2M across all rounds. Tracxn and Multiples agree on roughly $134M.\n- **Employee headcount:** sources disagree.\n  - PitchBook lists 141 employees as of 2026, but its page looks older.\n  - Tracxn reports 291 as of Aug 31, 2026.\n  - Another tracker shows 269 employees as of 2026-07-01.\n  - The most recent data points to roughly 270\u2013290.\n- **Founding year:** 2019. The founders are Karri Saarinen, Jori Lallo, and Tuomas Artman.\n- **Headquarters:** San Francisco, California.\n- **Revenue estimate:** about $100M in annual recurring revenue. Sacra estimates Linear hit $100M ARR in July 2026. One older ZoomInfo-based estimate of $42M also appears, but it is likely outdated.\n\n**Recent news**\n# Linear: key news, 2025\u20132026\n\n## Funding and valuation\n- **Series C, June 2025.** Linear raised $82M at a $1.25B valuation. The round included primary and secondary funding and was led by Accel, with continued support from Sequoia and 01A. New backers included Seven Seven Six and Designer Fund.\n- **Use of funds.** The money was meant to speed up product development, including deeper AI and agent capabilities.\n- **Secondary sale, August 2026.** One aggregator reports a secondary sale at a $2.5B valuation, led by Accel with Salesforce Ventures, S32 and 01 Advisors participating. The amount is listed as $99M in one place and $100M in another. The same source says the money went to employees, not the company's balance sheet. I only found this on aggregator sites, so treat it as less certain.\n- **Profitability.** Linear has been cashflow positive since 2021 and holds more cash than it has ever raised in primary funding.\n\n## Growth\n- **Revenue.** A February 2026 profile reported more than 20,000 customer companies and $100M in 2025 revenue. Linear's own site now claims more than 40,000 product teams.\n- **Customers.** Named customers include OpenAI, Cursor, Ramp, Coinbase, Cash App and Oscar Health.\n- **Hiring.** Headcount figures conflict across sources: 118 employees, roughly 160 to 190, and 269. The company grows slowly and stays remote. I found no reliable report of specific hires or executive changes.\n\n## Product launches\n- **Linear Diffs, 2026.** A way to review PRs directly inside Linear, listed on Product Hunt as launched May 29, 2026. Stacked PR support has since been added.\n- **Linear Agent, March 24, 2026.** Public beta, free on all plans during the beta. Agents are full workspace members that can be assigned issues and mentioned in comments. It was followed by Code Intelligence and MCP support.\n- **Shared Skills, June 4, 2026.** Lets teams save and reuse agent instructions.\n- **Coding Sessions, June 11, 2026.** Linear Agent can now write code using Claude Code and Codex. It is generally available on Basic, Business and Enterprise plans, and AI credits are required.\n- **Loops, July 20, 2026.** Recurring agent automations that run on a schedule or in response to an event. They are available on Business and Enterprise plans.\n- **Smaller releases.** These include a Priority inbox (Sept 3), Loops scheduling options (Sept 4) and agent-drafted projects (Sept 8). Other recent additions are agent-assisted project updates and private sub-teams.\n\n## Partnerships and integrations\n- **Coding agents.** The coding-agent features build on Claude Code and Codex. The changelog also lists GPT-5.6 Luna as a model option and GitHub Copilot for Linear.\n- **Integrations.** In June 2026 Linear announced integrations with Slack, Notion, Discord, Glean, Attio, Figma, Descript, YouTube, Miro, Loom and Tella. It also added compliance tools such as Vanta, Drata and Orca Security.\n- **Sequoia.** Linear appeared in a May 2026 Startup Grind conversation with Sequoia Capital about AI agents.\n\n## Setbacks and caveats\n- **Security incident.** Linear published a post-mortem on a security incident on March 24, 2026. I did not open it, so I can't give details.\n- **User complaints.** Some users report slow first-page loads, sync bugs, and growing complexity.\n- **Acquisition claim.** One aggregator says Linear \"was acquired.\" Other sources describe it as an independently run, venture-backed private company, so I'd disregard that claim.\n\nI can look further into the March 2026 security incident or the details of the August secondary sale if you'd like.",
     "sources": [
       {
         "id": 1,
-        "url": "https://linear.app/careers/cd5ae036-0223-427a-b038-ba16ef9dcb32",
+        "url": "https://news.ycombinator.com/item?id=33199304",
         "group": "technology"
       },
       {
         "id": 2,
-        "url": "https://cloud.google.com/blog/products/databases/product-workflow-tool-linear-uses-google-cloud-databases",
+        "url": "https://linear.app/careers/d3bc1ced-3ce4-4086-a050-555055dbb1ff",
         "group": "technology"
       },
       {
         "id": 3,
-        "url": "https://techstackmap.com/companies/linear",
+        "url": "https://peerlist.io/company/linear/careers/senior--staff-frontend-engineer/jobh8ojb7na9mlkjah9rmmko9m89gg",
         "group": "technology"
       },
       {
         "id": 4,
-        "url": "https://www.crunchbase.com/organization/linear-app/technology",
+        "url": "https://jobgether.com/offer/6956931d5737f7f2f20b60d1-senior-staff-fullstack-engineer",
         "group": "technology"
       },
       {
         "id": 5,
+        "url": "https://detectzestack.com/tech/linear.app",
+        "group": "technology"
+      },
+      {
+        "id": 6,
+        "url": "https://platformchecker.com/blog/linear-tech-stack-2026",
+        "group": "technology"
+      },
+      {
+        "id": 7,
+        "url": "https://webreveal.io/scan/linear.app.html",
+        "group": "technology"
+      },
+      {
+        "id": 8,
+        "url": "https://www.crunchbase.com/organization/linear-app/technology",
+        "group": "technology"
+      },
+      {
+        "id": 9,
+        "url": "https://stacks.efficient.app/apps/linear",
+        "group": "technology"
+      },
+      {
+        "id": 10,
+        "url": "https://www.extern.com/post/linear-internship-guide",
+        "group": "technology"
+      },
+      {
+        "id": 11,
+        "url": "https://stackshare.io/companies/linear/stack",
+        "group": "technology"
+      },
+      {
+        "id": 12,
         "url": "https://linear.app/careers/069c4628-88d7-4e4d-b393-c996fc7f3076",
         "group": "hiring"
       },
       {
-        "id": 6,
-        "url": "https://linear.app/careers/b4a7764e-c680-4bdf-9956-dc78f2ca94d5",
+        "id": 13,
+        "url": "https://jobs-radar.com/en/company/linear-9355",
         "group": "hiring"
       },
       {
-        "id": 7,
-        "url": "https://linear.app/careers/86abcce0-04b2-405c-9a8e-e0ca84813914",
+        "id": 14,
+        "url": "https://layiq.ai/companies/linear-11281",
         "group": "hiring"
       },
       {
-        "id": 8,
-        "url": "https://linear.app/careers/a264869e-f058-487c-ab7f-9b77dffa427c",
+        "id": 15,
+        "url": "https://linear.app/careers/2ef60eea-7cff-45c2-abf2-eaedc4ea89bd",
         "group": "hiring"
       },
       {
-        "id": 9,
-        "url": "https://linear.app/careers/3d95000c-5631-4ea6-a614-78910bb3f199",
-        "group": "hiring"
-      },
-      {
-        "id": 10,
-        "url": "https://www.dreamworkhq.com/c/linear.app",
-        "group": "hiring"
-      },
-      {
-        "id": 11,
-        "url": "https://jobsbyculture.com/companies/linear",
-        "group": "hiring"
-      },
-      {
-        "id": 12,
+        "id": 16,
         "url": "https://tracxn.com/d/companies/linear/__xC97n-jdX7VZjDBpNyRfVH-H_Elzu354nD5Yz5FaUVI",
         "group": "web search"
       },
       {
-        "id": 13,
-        "url": "https://getlatka.com/companies/linear.app",
-        "group": "web search"
-      },
-      {
-        "id": 14,
-        "url": "https://sacra.com/c/linear/",
-        "group": "web search"
-      },
-      {
-        "id": 15,
-        "url": "https://tour.pitchbook.com/answers/linear-company-profile",
-        "group": "web search"
-      },
-      {
-        "id": 16,
-        "url": "https://www.startuphub.ai/startups/linear",
-        "group": "web search"
-      },
-      {
         "id": 17,
-        "url": "https://www.cbinsights.com/company/linear-1",
-        "group": "web search"
-      },
-      {
-        "id": 18,
-        "url": "https://linear.app/now/building-our-way",
-        "group": "web search"
-      },
-      {
-        "id": 19,
-        "url": "https://arcticstartup.com/linear-raises-82m-series-c/",
-        "group": "web search"
-      },
-      {
-        "id": 20,
         "url": "https://multiples.vc/private-comps/linear",
         "group": "web search"
       },
       {
+        "id": 18,
+        "url": "https://sacra.com/c/linear/",
+        "group": "web search"
+      },
+      {
+        "id": 19,
+        "url": "https://tour.pitchbook.com/answers/linear-company-profile",
+        "group": "web search"
+      },
+      {
+        "id": 20,
+        "url": "https://siliconvalleyinvestclub.com/companies/linear/",
+        "group": "web search"
+      },
+      {
         "id": 21,
-        "url": "https://linear.app/now",
+        "url": "https://websets.exa.ai/websets/directory/linear-funding",
         "group": "web search"
       },
       {
         "id": 22,
-        "url": "https://blog.mean.ceo/linear-news-august-2026/",
+        "url": "https://linear.app/now/building-our-way",
         "group": "web search"
       },
       {
         "id": 23,
-        "url": "https://www.indexbox.io/blog/linear-secures-82-million-in-series-c-funding-eyes-expansion/",
+        "url": "https://www.thesaasnews.com/news/linear-raises-82-million-in-series-c/",
         "group": "web search"
       },
       {
         "id": 24,
-        "url": "https://spyingbee.com/updates/linear/2026-03",
+        "url": "https://blog.mean.ceo/linear-news-september-2026/",
         "group": "web search"
       },
       {
         "id": 25,
-        "url": "https://spyingbee.com/updates/linear",
+        "url": "https://nubiapage.com/linear-review-2026-app-ai-login-company/",
+        "group": "web search"
+      },
+      {
+        "id": 26,
+        "url": "https://getlatka.com/companies/linear.app",
+        "group": "web search"
+      },
+      {
+        "id": 27,
+        "url": "https://www.producthunt.com/products/linear",
+        "group": "web search"
+      },
+      {
+        "id": 28,
+        "url": "https://www.siit.io/tools/trending/linear-app-review",
+        "group": "web search"
+      },
+      {
+        "id": 29,
+        "url": "https://linear.app/changelog/2026-06-11-coding-sessions",
+        "group": "web search"
+      },
+      {
+        "id": 30,
+        "url": "https://spyingbee.com/updates/linear/2026-06",
+        "group": "web search"
+      },
+      {
+        "id": 31,
+        "url": "https://linear.app/now",
         "group": "web search"
       }
     ],
@@ -258,39 +284,45 @@
     "partial_errors": {},
     "source_urls": {
       "technology": [
-        "https://linear.app/careers/cd5ae036-0223-427a-b038-ba16ef9dcb32",
-        "https://cloud.google.com/blog/products/databases/product-workflow-tool-linear-uses-google-cloud-databases",
-        "https://techstackmap.com/companies/linear",
-        "https://www.crunchbase.com/organization/linear-app/technology"
+        "https://news.ycombinator.com/item?id=33199304",
+        "https://linear.app/careers/d3bc1ced-3ce4-4086-a050-555055dbb1ff",
+        "https://peerlist.io/company/linear/careers/senior--staff-frontend-engineer/jobh8ojb7na9mlkjah9rmmko9m89gg",
+        "https://jobgether.com/offer/6956931d5737f7f2f20b60d1-senior-staff-fullstack-engineer",
+        "https://detectzestack.com/tech/linear.app",
+        "https://platformchecker.com/blog/linear-tech-stack-2026",
+        "https://webreveal.io/scan/linear.app.html",
+        "https://www.crunchbase.com/organization/linear-app/technology",
+        "https://stacks.efficient.app/apps/linear",
+        "https://www.extern.com/post/linear-internship-guide",
+        "https://stackshare.io/companies/linear/stack"
       ],
       "hiring": [
         "https://linear.app/careers/069c4628-88d7-4e4d-b393-c996fc7f3076",
-        "https://linear.app/careers/b4a7764e-c680-4bdf-9956-dc78f2ca94d5",
-        "https://linear.app/careers/cd5ae036-0223-427a-b038-ba16ef9dcb32",
-        "https://linear.app/careers/86abcce0-04b2-405c-9a8e-e0ca84813914",
-        "https://linear.app/careers/a264869e-f058-487c-ab7f-9b77dffa427c",
-        "https://linear.app/careers/3d95000c-5631-4ea6-a614-78910bb3f199",
-        "https://www.dreamworkhq.com/c/linear.app",
-        "https://jobsbyculture.com/companies/linear"
+        "https://jobs-radar.com/en/company/linear-9355",
+        "https://layiq.ai/companies/linear-11281",
+        "https://linear.app/careers/2ef60eea-7cff-45c2-abf2-eaedc4ea89bd",
+        "https://www.extern.com/post/linear-internship-guide"
       ],
       "web_search": [
         "https://tracxn.com/d/companies/linear/__xC97n-jdX7VZjDBpNyRfVH-H_Elzu354nD5Yz5FaUVI",
-        "https://getlatka.com/companies/linear.app",
+        "https://multiples.vc/private-comps/linear",
         "https://sacra.com/c/linear/",
         "https://tour.pitchbook.com/answers/linear-company-profile",
-        "https://www.startuphub.ai/startups/linear",
-        "https://www.cbinsights.com/company/linear-1",
+        "https://siliconvalleyinvestclub.com/companies/linear/",
+        "https://websets.exa.ai/websets/directory/linear-funding",
         "https://linear.app/now/building-our-way",
-        "https://arcticstartup.com/linear-raises-82m-series-c/",
-        "https://multiples.vc/private-comps/linear",
-        "https://linear.app/now",
-        "https://blog.mean.ceo/linear-news-august-2026/",
-        "https://www.indexbox.io/blog/linear-secures-82-million-in-series-c-funding-eyes-expansion/",
-        "https://spyingbee.com/updates/linear/2026-03",
-        "https://spyingbee.com/updates/linear"
+        "https://www.thesaasnews.com/news/linear-raises-82-million-in-series-c/",
+        "https://blog.mean.ceo/linear-news-september-2026/",
+        "https://nubiapage.com/linear-review-2026-app-ai-login-company/",
+        "https://getlatka.com/companies/linear.app",
+        "https://www.producthunt.com/products/linear",
+        "https://www.siit.io/tools/trending/linear-app-review",
+        "https://linear.app/changelog/2026-06-11-coding-sessions",
+        "https://spyingbee.com/updates/linear/2026-06",
+        "https://linear.app/now"
       ]
     }
   },
   "product_description": "Spend management and corporate cards for fast-growing tech companies.",
-  "analyzed_at": "2026-10-01T14:23:01.544995+00:00"
+  "analyzed_at": "2026-10-17T18:26:31.374680+00:00"
 }

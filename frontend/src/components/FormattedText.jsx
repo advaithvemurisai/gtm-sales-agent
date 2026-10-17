@@ -1,7 +1,14 @@
 import React from 'react';
 
+// Older saved results joined cited fragments with spaces ("led it ." / "( PitchBook"); close those gaps.
+function tidySpacing(text) {
+  return String(text || '')
+    .replace(/[ \t]+([.,;:!?)\]])/g, '$1')
+    .replace(/([(\[])[ \t]+/g, '$1');
+}
+
 function renderInline(text) {
-  const parts = String(text || '').split(/(\*\*[^*]+\*\*)/g);
+  const parts = tidySpacing(text).split(/(\*\*[^*]+\*\*)/g);
 
   return parts.map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) {
@@ -45,6 +52,18 @@ function getBulletItems(block) {
   return lines.map((line) => line.replace(/^[-*]\s+/, '').trim()).filter(Boolean);
 }
 
+function splitRow(line) {
+  return line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((cell) => cell.trim());
+}
+
+// A markdown table: a header row, a |---|---| separator, then body rows.
+function getTable(block) {
+  const lines = block.split('\n').map((line) => line.trim()).filter(Boolean);
+  if (lines.length < 2 || !lines.every((line) => line.startsWith('|'))) return null;
+  if (!/^\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?$/.test(lines[1])) return null;
+  return { header: splitRow(lines[0]), rows: lines.slice(2).map(splitRow) };
+}
+
 function FormattedText({ text }) {
   const blocks = splitBlocks(text);
   if (!blocks.length) return null;
@@ -53,6 +72,24 @@ function FormattedText({ text }) {
     <div className="prose">
       {blocks.map((block, index) => {
         if (isHeading(block)) return <p key={index} className="prose-heading">{cleanHeading(block)}</p>;
+
+        const table = getTable(block);
+        if (table) {
+          return (
+            <div key={index} className="prose-table-wrap">
+              <table className="prose-table">
+                <thead>
+                  <tr>{table.header.map((cell, cellIndex) => <th key={cellIndex} scope="col">{renderInline(cell)}</th>)}</tr>
+                </thead>
+                <tbody>
+                  {table.rows.map((row, rowIndex) => (
+                    <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{renderInline(cell)}</td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
 
         const bulletItems = getBulletItems(block);
         if (bulletItems) {
